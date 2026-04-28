@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kiriya Tools — 月額不要の買い切りWebツール</title>
+  <meta name="description" content="月額不要の買い切りWebツール。フリーランス・個人事業主・クリエイター向けのシンプルな生産性ツールを個人開発で提供。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Kiriya Tools — 月額不要の買い切りWebツール" />
+  <meta property="og:description" content="月額不要の買い切りWebツール。フリーランス・個人事業主・クリエイター向けのシンプルな生産性ツールを個人開発で提供。" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Kiriya Tools — 月額不要の買い切りWebツール" />
+  <meta name="twitter:description" content="月額不要の買い切りWebツール。フリーランス・個人事業主・クリエイター向けのシンプルな生産性ツールを個人開発で提供。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   RESET & TOKENS
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --blue:        #2563eb;
+  --blue-dark:   #1d4ed8;
+  --blue-dim:    rgba(37,99,235,.15);
+  --blue-glow:   rgba(37,99,235,.35);
+  --cyan:        #06b6d4;
+  --indigo:      #6366f1;
+  --text:        #0f172a;
+  --text-mid:    #475569;
+  --text-muted:  #94a3b8;
+  --border:      rgba(226,232,240,.8);
+  --border-dark: rgba(255,255,255,.08);
+  --white:       #ffffff;
+  --off-white:   #f8fafc;
+  --dark:        #0a0f1e;
+  --dark2:       #0f172a;
+  --dark3:       #1e293b;
+  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-xl: 32px;
+  --ease: cubic-bezier(.25,.46,.45,.94);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+}
+
+body {
+  font-family: 'Noto Sans JP', 'Inter', sans-serif;
+  background: var(--white);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.en { font-family: 'Inter', sans-serif; }
+
+/* ============================================================
+   NOISE TEXTURE OVERLAY
+============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .4;
+}
+
+/* ============================================================
+   NAV
+============================================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 500;
+  transition: background .4s var(--ease), box-shadow .4s var(--ease);
+}
+nav.scrolled {
+  background: rgba(10,15,30,.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 var(--border-dark);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -.03em;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.nav-logo .logo-k {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Inter', sans-serif;
+  font-size: .85rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  letter-spacing: .01em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: #fff; }
+.nav-pill {
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #fff !important;
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-weight: 600 !important;
+  font-size: .82rem !important;
+  letter-spacing: .02em;
+  box-shadow: 0 0 20px var(--blue-glow);
+  transition: box-shadow .3s, transform .2s !important;
+}
+.nav-pill:hover {
+  box-shadow: 0 0 32px var(--blue-glow) !important;
+  transform: translateY(-1px);
+}
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: rgba(255,255,255,.7);
+  border-radius: 2px;
+  transition: .3s;
+}
+
+/* ============================================================
+   HERO — DARK CINEMATIC
+============================================================ */
+#hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background: var(--dark);
+  overflow: hidden;
+}
+
+/* 背景グリッド */
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* オーブ光源 */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.hero-orb-1 {
+  width: 700px; height: 700px;
+  top: -200px; right: -100px;
+  background: radial-gradient(circle, rgba(37,99,235,.25) 0%, transparent 70%);
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.hero-orb-2 {
+  width: 500px; height: 500px;
+  bottom: -150px; left: -100px;
+  background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%);
+  animation: orbFloat 10s ease-in-out infinite reverse;
+}
+.hero-orb-3 {
+  width: 300px; height: 300px;
+  top: 40%; left: 45%;
+  background: radial-gradient(circle, rgba(6,182,212,.12) 0%, transparent 70%);
+  animation: orbFloat 12s ease-in-out infinite 3s;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
+}
+
+/* パーティクル */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: rgba(255,255,255,.5);
+  border-radius: 50%;
+  animation: particleFloat linear infinite;
+}
+@keyframes particleFloat {
+  0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-20px) translateX(30px); opacity: 0; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 28px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* 左テキスト */
+.hero-text {}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 24px;
+  padding: 6px 14px;
+  border: 1px solid rgba(6,182,212,.3);
+  border-radius: 100px;
+  background: rgba(6,182,212,.06);
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+.hero-h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.hero-h1 .grad {
+  background: linear-gradient(135deg, #60a5fa 0%, var(--cyan) 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-en-copy {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(.9rem, 1.5vw, 1.05rem);
+  font-style: italic;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 20px;
+  font-weight: 300;
+  letter-spacing: .01em;
+}
+.hero-desc {
+  font-size: clamp(.9rem, 1.5vw, 1rem);
+  color: rgba(255,255,255,.55);
+  line-height: 1.8;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+
+.hero-cta-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.btn-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  padding: 15px 32px;
+  border-radius: 100px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #fff;
+  box-shadow: 0 0 30px var(--blue-glow), inset 0 1px 0 rgba(255,255,255,.2);
+  transition: transform .25s var(--spring), box-shadow .25s var(--ease);
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.btn-glow:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 50px var(--blue-glow), 0 8px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2); }
+.btn-glow:hover::before { opacity: 1; }
+.btn-outline-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: .9rem;
+  padding: 14px 26px;
+  border-radius: 100px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.7);
+  transition: border-color .2s, color .2s, background .2s;
+  backdrop-filter: blur(4px);
+}
+.btn-outline-white:hover {
+  border-color: rgba(255,255,255,.5);
+  color: #fff;
+  background: rgba(255,255,255,.05);
+}
+
+/* 右側 — フローティングカード */
+.hero-card-stack {
+  position: relative;
+  height: 420px;
+}
+.hcard {
+  position: absolute;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(12px);
+  padding: 24px 28px;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hcard-main {
+  width: 100%;
+  top: 40px;
+  left: 0;
+  animation: cardFloat 5s ease-in-out infinite;
+}
+.hcard-stat1 {
+  width: 200px;
+  bottom: 20px;
+  left: -20px;
+  animation: cardFloat 6s ease-in-out infinite 1s;
+  background: rgba(37,99,235,.15);
+  border-color: rgba(37,99,235,.3);
+}
+.hcard-stat2 {
+  width: 180px;
+  top: 10px;
+  right: -10px;
+  animation: cardFloat 7s ease-in-out infinite 2s;
+  background: rgba(6,182,212,.1);
+  border-color: rgba(6,182,212,.25);
+}
+@keyframes cardFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+.hcard-label {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hcard-label::before {
+  content: '';
+  width: 18px; height: 2px;
+  background: var(--cyan);
+  display: block;
+}
+.hcard-product-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -.01em;
+}
+.hcard-product-sub {
+  font-size: .78rem;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 18px;
+}
+.hcard-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.hcard-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(37,99,235,.4);
+  color: #60a5fa;
+  background: rgba(37,99,235,.12);
+}
+.hcard-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.hcard-price {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+.hcard-price small {
+  font-size: .62rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.4);
+  margin-left: 3px;
+}
+.hcard-buy-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 0 16px var(--blue-glow);
+  transition: transform .2s var(--spring);
+  white-space: nowrap;
+}
+.hcard-buy-btn:hover { transform: scale(1.05); }
+
+.hcard-stat-num {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+.hcard-stat-label {
+  font-size: .72rem;
+  color: rgba(255,255,255,.45);
+}
+
+/* スクロールヒント */
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.scroll-mouse {
+  width: 24px; height: 36px;
+  border: 2px solid rgba(255,255,255,.25);
+  border-radius: 12px;
+  position: relative;
+}
+.scroll-mouse::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px; height: 6px;
+  background: rgba(255,255,255,.5);
+  border-radius: 2px;
+  animation: scrollDot 2s ease-in-out infinite;
+}
+@keyframes scrollDot {
+  0%,100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  50%      { transform: translateX(-50%) translateY(10px); opacity: .2; }
+}
+.scroll-label {
+  font-family: 'Inter', sans-serif;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+}
+
+/* ============================================================
+   MARQUEE STRIP
+============================================================ */
+.marquee-strip {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
+  padding: 14px 0;
+  overflow: hidden;
+  position: relative;
+}
+.marquee-inner {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-item {
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.marquee-sep {
+  color: rgba(255,255,255,.3);
+}
+
+/* ============================================================
+   SECTION BASE
+============================================================ */
+.section { padding: 120px 0; }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.sec-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-eyebrow::before {
+  content: '';
+  width: 24px; height: 2px;
+  background: var(--blue);
+  display: block;
+}
+.sec-h2 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.sec-h2-en {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(.95rem, 2vw, 1.15rem);
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: .01em;
+  margin-top: 6px;
+}
+.sec-desc {
+  font-size: .95rem;
+  color: var(--text-mid);
+  max-width: 560px;
+  line-height: 1.8;
+  margin-top: 16px;
+}
+
+/* ============================================================
+   PRODUCTS
+============================================================ */
+#products { background: var(--off-white); }
+.products-layout {
+  display: grid;
+  gap: 40px;
+}
+.products-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* 商品カード */
+.pcard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform .3s var(--spring), box-shadow .3s var(--ease), border-color .3s;
+  cursor: default;
+}
+.pcard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 64px rgba(37,99,235,.12), 0 4px 16px rgba(0,0,0,.06);
+  border-color: rgba(37,99,235,.25);
+}
+.pcard-accent-bar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+}
+.pcard-body {
+  padding: 28px 28px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.pcard-icon-wrap {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--blue-dim), rgba(6,182,212,.1));
+  border: 1px solid rgba(37,99,235,.15);
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  transition: transform .3s var(--spring);
+}
+.pcard:hover .pcard-icon-wrap { transform: scale(1.1) rotate(-4deg); }
+.pcard-en {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 5px;
+}
+.pcard-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -.01em;
+  line-height: 1.35;
+}
+.pcard-desc {
+  font-size: .845rem;
+  color: var(--text-mid);
+  line-height: 1.75;
+  flex: 1;
+  margin-bottom: 18px;
+}
+.pcard-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+.ptag {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(37,99,235,.15);
+  letter-spacing: .02em;
+}
+.pcard-footer {
+  border-top: 1px solid var(--border);
+  padding: 18px 28px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pcard-price {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -.03em;
+}
+.pcard-price-note {
+  font-size: .62rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 1px;
+}
+.btn-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  padding: 10px 20px;
+  border-radius: 100px;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #fff;
+  box-shadow: 0 2px 12px var(--blue-glow);
+  transition: transform .2s var(--spring), box-shadow .2s;
+  white-space: nowrap;
+}
+.btn-detail:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 20px var(--blue-glow);
+}
+/* Coming Soon カード */
+.pcard--coming {
+  border-style: dashed;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+.pcard--coming .pcard-accent-bar {
+  background: linear-gradient(90deg, #cbd5e1, #e2e8f0);
+}
+.pcard--coming:hover {
+  box-shadow: none;
+  border-color: #cbd5e1;
+  transform: none;
+}
+.coming-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 220px;
+  gap: 10px;
+}
+.coming-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: #e2e8f0;
+  color: #94a3b8;
+}
+.coming-title { font-size: 1rem; font-weight: 700; color: #94a3b8; }
+.coming-desc  { font-size: .82rem; color: #b0bec5; line-height: 1.6; }
+
+/* ============================================================
+   FEATURES — DARK BENTO GRID
+============================================================ */
+#features {
+  background: var(--dark2);
+  position: relative;
+  overflow: hidden;
+}
+#features::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(37,99,235,.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+#features .sec-h2 { color: #fff; }
+#features .sec-eyebrow { color: var(--cyan); }
+#features .sec-eyebrow::before { background: var(--cyan); }
+#features .sec-desc { color: rgba(255,255,255,.45); }
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 20px;
+  margin-top: 60px;
+}
+.bento-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--r-lg);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: background .3s, border-color .3s, transform .3s var(--spring);
+}
+.bento-card:hover {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.14);
+  transform: translateY(-3px);
+}
+.bento-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37,99,235,.06), transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.bento-card:hover::after { opacity: 1; }
+.bento-wide { grid-column: span 2; }
+.bento-icon {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+.bento-en {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+.bento-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -.01em;
+  position: relative;
+  z-index: 1;
+}
+.bento-desc {
+  font-size: .845rem;
+  color: rgba(255,255,255,.45);
+  line-height: 1.75;
+  position: relative;
+  z-index: 1;
+}
+/* 比較ビジュアル (ワイドカード内) */
+.compare-visual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 1;
+}
+.compare-col {
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+}
+.compare-col--bad {
+  background: rgba(239,68,68,.08);
+  border: 1px solid rgba(239,68,68,.2);
+}
+.compare-col--good {
+  background: rgba(37,99,235,.1);
+  border: 1px solid rgba(37,99,235,.25);
+}
+.compare-head {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.compare-col--bad .compare-head  { color: #f87171; }
+.compare-col--good .compare-head { color: #60a5fa; }
+.compare-item {
+  font-size: .78rem;
+  color: rgba(255,255,255,.5);
+  padding: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.compare-item:last-child { border-bottom: none; }
+.compare-item .ci { font-size: .8rem; flex-shrink: 0; }
+/* ミニ価格表示 */
+.bento-price-display {
+  margin-top: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+.bento-price-num {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -.04em;
+  background: linear-gradient(135deg, #60a5fa, var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.bento-price-suffix {
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  color: rgba(255,255,255,.35);
+}
+.bento-forever-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  background: rgba(37,99,235,.2);
+  border: 1px solid rgba(37,99,235,.4);
+  color: #93c5fd;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   ABOUT — SPLIT
+============================================================ */
+#about { background: var(--white); }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.about-visual {
+  position: relative;
+}
+.about-card-bg {
+  background: linear-gradient(135deg, var(--dark2), var(--dark3));
+  border-radius: var(--r-xl);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,.2);
+}
+.about-card-bg::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(37,99,235,.2), transparent 70%);
+  border-radius: 50%;
+}
+.about-avatar {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+.about-card-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+.about-card-role {
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+.stack-title {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+.stack-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.sbadge {
+  font-family: 'Inter', sans-serif;
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 5px 13px;
+  border-radius: 100px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
+  transition: background .2s, border-color .2s, color .2s;
+  cursor: default;
+}
+.sbadge:hover {
+  background: var(--blue-dim);
+  border-color: rgba(37,99,235,.4);
+  color: #60a5fa;
+}
+.about-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 1;
+}
+.about-stat {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--r-md);
+  padding: 14px;
+  text-align: center;
+}
+.about-stat-num {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -.03em;
+}
+.about-stat-label {
+  font-size: .7rem;
+  color: rgba(255,255,255,.35);
+  margin-top: 2px;
+}
+
+.about-text-side {}
+.about-text-side p {
+  font-size: .95rem;
+  color: var(--text-mid);
+  line-height: 1.85;
+  margin-bottom: 16px;
+}
+.about-quote {
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  font-size: .875rem;
+  color: var(--text-muted);
+  border-left: 3px solid var(--blue);
+  padding-left: 16px;
+  margin: 24px 0;
+  line-height: 1.7;
+}
+.about-stack-note {
+  font-size: .82rem;
+  color: var(--text-muted);
+}
+.about-stack-note-en {
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ============================================================
+   CTA BANNER
+============================================================ */
+#cta-banner {
+  background: linear-gradient(135deg, var(--dark) 0%, #0d1840 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 100px 0;
+}
+#cta-banner::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(37,99,235,.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.cta-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 20px;
+}
+.cta-h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -.03em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.cta-h2 span {
+  background: linear-gradient(135deg, #60a5fa, var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cta-desc {
+  font-size: .95rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.8;
+  margin-bottom: 36px;
+}
+.cta-btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer {
+  background: var(--dark);
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 60px 0 36px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 60px;
+  margin-bottom: 48px;
+}
+.footer-brand {}
+.footer-logo {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 1.25rem;
+  color: #fff;
+  letter-spacing: -.03em;
+  margin-bottom: 10px;
+}
+.footer-logo span {
+  background: linear-gradient(135deg, #60a5fa, var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-tagline {
+  font-size: .82rem;
+  color: rgba(255,255,255,.35);
+  line-height: 1.7;
+  max-width: 280px;
+}
+.footer-contact-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+.footer-contact-label {
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+}
+.btn-footer-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: .875rem;
+  padding: 12px 24px;
+  border-radius: 100px;
+  text-decoration: none;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.8);
+  transition: background .2s, border-color .2s, color .2s;
+}
+.btn-footer-contact:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.2);
+  color: #fff;
+}
+.footer-social {
+  display: flex;
+  gap: 10px;
+}
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: .78rem;
+  color: rgba(255,255,255,.35);
+  text-decoration: none;
+  transition: color .2s;
+}
+.social-btn:hover { color: rgba(255,255,255,.7); }
+.footer-hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,.06);
+  margin-bottom: 24px;
+}
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-copy {
+  font-family: 'Inter', sans-serif;
+  font-size: .75rem;
+  color: rgba(255,255,255,.2);
+}
+.footer-note {
+  font-size: .72rem;
+  color: rgba(255,255,255,.15);
+}
+
+/* ============================================================
+   ANIMATIONS — SCROLL REVEAL
+============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
+}
+.reveal.from-left  { transform: translateX(-32px); }
+.reveal.from-right { transform: translateX(32px); }
+.reveal.visible {
+  opacity: 1;
+  transform: translate(0);
+}
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 1024px) {
+  .hero-content    { grid-template-columns: 1fr; gap: 60px; padding-top: 140px; }
+  .hero-card-stack { height: 340px; }
+  .bento-grid      { grid-template-columns: 1fr 1fr; }
+  .bento-wide      { grid-column: span 2; }
+  .about-grid      { grid-template-columns: 1fr; gap: 48px; }
+  .footer-grid     { grid-template-columns: 1fr; gap: 32px; }
+  .footer-contact-col { align-items: flex-start; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 64px; left: 0; right: 0;
+    background: rgba(10,15,30,.97);
+    backdrop-filter: blur(20px);
+    padding: 24px 28px;
+    gap: 20px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .nav-hamburger { display: flex; }
+  .products-grid  { grid-template-columns: 1fr; }
+  .bento-grid     { grid-template-columns: 1fr; }
+  .bento-wide     { grid-column: span 1; }
+  .compare-visual { grid-template-columns: 1fr; }
+  .hero-h1        { font-size: 2.2rem; }
+  .section        { padding: 80px 0; }
+  .hero-card-stack{ display: none; }
+  .hero-content   { grid-template-columns: 1fr; }
+  .about-stat-row { grid-template-columns: repeat(3,1fr); }
+}
+@media (max-width: 480px) {
+  .hero-cta-row { flex-direction: column; align-items: flex-start; }
+  .products-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+  .cta-btns      { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo en"><span class="logo-k">Kiriya</span>Tools</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#products">Products</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact-form" class="nav-pill en">お問い合わせ</a></li>
+    </ul>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleNav()" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+  <div class="hero-particles" id="particles"></div>
+
+  <div class="hero-content">
+    <!-- テキスト -->
+    <div class="hero-text">
+      <div class="hero-eyebrow en">
+        <span class="hero-eyebrow-dot"></span>
+        Solo Developer · Made in Japan
+      </div>
+      <h1 class="hero-h1">
+        月額不要。<br>
+        ずっと使える、<br>
+        <span class="grad">買い切りWebツール。</span>
+      </h1>
+      <p class="hero-en-copy en">"No subscriptions. Simple tools you buy once and own forever."</p>
+      <p class="hero-desc">個人開発者が作る、シンプルで手頃な生産性ツール。<br>一度買えば、それだけ。あとはずっとあなたのもの。</p>
+      <div class="hero-cta-row">
+        <a href="#products" class="btn-glow en">
+          ツール一覧を見る
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#about" class="btn-outline-white">開発者について</a>
+      </div>
+    </div>
+
+    <!-- フローティングカード -->
+    <div class="hero-card-stack">
+      <div class="hcard hcard-main">
+        <div class="hcard-label en">Featured Product</div>
+        <div class="hcard-product-name">Invoice Generator</div>
+        <div class="hcard-product-sub">請求書自動作成ツール — インボイス制度対応</div>
+        <div class="hcard-tags">
+          <span class="hcard-tag en">買い切り</span>
+          <span class="hcard-tag en">インボイス対応</span>
+          <span class="hcard-tag en">オフライン動作</span>
+        </div>
+        <div class="hcard-price-row">
+          <div class="hcard-price en">¥2,980<small>（税込）</small></div>
+          <a href="invoice/index.html" class="hcard-buy-btn en">今すぐ試す →</a>
+        </div>
+      </div>
+      <div class="hcard hcard-stat1">
+        <div class="hcard-stat-num en">¥0</div>
+        <div class="hcard-stat-label">月額費用</div>
+      </div>
+      <div class="hcard hcard-stat2">
+        <div class="hcard-stat-num en">∞</div>
+        <div class="hcard-stat-label">使用期限</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <div class="scroll-mouse"></div>
+    <span class="scroll-label en">Scroll</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     MARQUEE
+============================================================ -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-inner">
+    <!-- 2セット繰り返してシームレスに -->
+    <span class="marquee-item en">Buy Once <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">月額不要 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">Own Forever <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">プライバシー重視 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">No Subscription <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">シンプル設計 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">Solo Developer <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">Made in Japan <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">Buy Once <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">月額不要 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">Own Forever <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">プライバシー重視 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">No Subscription <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">シンプル設計 <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item en">Solo Developer <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item">Made in Japan <span class="marquee-sep">✦</span></span>
+  </div>
+</div>
+
+<!-- ============================================================
+     PRODUCTS
+============================================================ -->
+<section id="products" class="section">
+  <div class="container">
+    <div class="products-header-row reveal">
+      <div>
+        <div class="sec-eyebrow en">Products</div>
+        <h2 class="sec-h2">ツール一覧<span class="sec-h2-en en">Simple tools. One-time purchase.</span></h2>
+      </div>
+      <p class="sec-desc">すべて買い切り価格。追加料金・月額費用は一切なし。</p>
+    </div>
+
+    <div class="products-grid" style="margin-top: 48px;">
+
+      <!-- ===============================
+           商品カード（既存商品）
+           新しい商品を追加するときは、この .pcard ブロックをコピーして
+           products-grid の中に貼り付け、各値を書き換えてください。
+      ================================ -->
+      <article class="pcard reveal reveal-delay-1">
+        <div class="pcard-accent-bar"></div>
+        <div class="pcard-body">
+          <div class="pcard-icon-wrap">🧾</div>
+          <p class="pcard-en en">Invoice Generator</p>
+          <h3 class="pcard-name">請求書自動作成ツール</h3>
+          <p class="pcard-desc">フリーランス向け。入力するだけで請求書PDFを即生成。インボイス制度にも完全対応。自社情報を保存してワンクリック発行。</p>
+          <div class="pcard-tags">
+            <span class="ptag">買い切り</span>
+            <span class="ptag">インボイス対応</span>
+            <span class="ptag">オフライン動作</span>
+          </div>
+        </div>
+        <div class="pcard-footer">
+          <div>
+            <div class="pcard-price en">¥2,980</div>
+            <span class="pcard-price-note">税込・買い切り・永久利用</span>
+          </div>
+          <!-- 請求書ツールのリンク（invoice/index.html に接続済み） -->
+          <a href="invoice/index.html" class="btn-detail en">
+            詳しく見る
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+      <!-- 新しい商品カードをここにコピー -->
+
+      <!-- ===============================
+           Coming Soon カード 1
+           新商品が決まったら .pcard--coming を外して商品カードへ変換。
+      ================================ -->
+      <article class="pcard pcard--coming reveal reveal-delay-2">
+        <div class="pcard-accent-bar"></div>
+        <div class="pcard-body">
+          <div class="pcard-icon-wrap" style="background:#f1f5f9;">🔮</div>
+          <div class="coming-body">
+            <span class="coming-badge en">Coming Soon</span>
+            <p class="coming-title">Next Tool — 次のツール</p>
+            <p class="coming-desc">開発中。近日公開予定。どんなツールが欲しいか、ぜひリクエストを。</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===============================
+           Coming Soon カード 2
+      ================================ -->
+      <article class="pcard pcard--coming reveal reveal-delay-3">
+        <div class="pcard-accent-bar"></div>
+        <div class="pcard-body">
+          <div class="pcard-icon-wrap" style="background:#f1f5f9;">💡</div>
+          <div class="coming-body">
+            <span class="coming-badge en">Coming Soon</span>
+            <p class="coming-title">New Idea — 企画中</p>
+            <p class="coming-desc">アイデア募集中。X（Twitter）でリクエストを受け付けています。</p>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /products-grid -->
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES — DARK BENTO
+============================================================ -->
+<section id="features" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-eyebrow en">Why Kiriya Tools?</div>
+      <h2 class="sec-h2">選ばれる理由<span class="sec-h2-en en">Built with clarity. Designed to last.</span></h2>
+    </div>
+
+    <div class="bento-grid">
+
+      <!-- ワイド: 買い切り比較 -->
+      <div class="bento-card bento-wide reveal reveal-delay-1">
+        <span class="bento-icon">💰</span>
+        <p class="bento-en en">One-Time Price</p>
+        <h3 class="bento-title">買い切り価格 — 月額ゼロ円</h3>
+        <p class="bento-desc">一度だけ支払えば、それでおしまい。更新費用も、プラン変更の心配もない。サブスクの「気づいたら○万円」とはサヨナラ。</p>
+        <div class="compare-visual">
+          <div class="compare-col compare-col--bad">
+            <div class="compare-head en">Subscription SaaS</div>
+            <div class="compare-item"><span class="ci">✗</span> 月額 ¥1,980〜/月</div>
+            <div class="compare-item"><span class="ci">✗</span> 年間 ¥23,760〜</div>
+            <div class="compare-item"><span class="ci">✗</span> プラン縛り・解約手続き</div>
+            <div class="compare-item"><span class="ci">✗</span> 値上げリスク</div>
+          </div>
+          <div class="compare-col compare-col--good">
+            <div class="compare-head en">Kiriya Tools</div>
+            <div class="compare-item"><span class="ci">✓</span> 買い切り ¥2,980</div>
+            <div class="compare-item"><span class="ci">✓</span> 2年目以降 ¥0</div>
+            <div class="compare-item"><span class="ci">✓</span> 解約不要・永久利用</div>
+            <div class="compare-item"><span class="ci">✓</span> 価格固定・追加なし</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- シンプル設計 -->
+      <div class="bento-card reveal reveal-delay-2">
+        <span class="bento-icon">⚡</span>
+        <p class="bento-en en">Simple by Design</p>
+        <h3 class="bento-title">シンプル設計</h3>
+        <p class="bento-desc">必要な機能だけを、迷いなく使える形に。チュートリアル不要、設定画面も最小限。開いた瞬間から仕事に集中できる。</p>
+        <div class="bento-price-display">
+          <span class="bento-price-num en">0</span>
+          <span class="bento-price-suffix">分で使い始められる</span>
+        </div>
+      </div>
+
+      <!-- プライバシー -->
+      <div class="bento-card reveal reveal-delay-3">
+        <span class="bento-icon">🔒</span>
+        <p class="bento-en en">Privacy First</p>
+        <h3 class="bento-title">プライバシー重視</h3>
+        <p class="bento-desc">入力データはあなたのブラウザに保存。外部サーバーへの送信なし。請求書の情報が誰かのクラウドに残る心配ゼロ。</p>
+        <div class="bento-forever-badge en">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Data stays on your device
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+============================================================ -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="about-grid">
+
+      <!-- 左: ビジュアルカード -->
+      <div class="about-visual reveal from-left">
+        <div class="about-card-bg">
+          <div class="about-avatar">⚙️</div>
+          <div class="about-card-name en">Kiriya Tools</div>
+          <div class="about-card-role">Solo Developer · Japan</div>
+
+          <div class="stack-title en">Tech Stack</div>
+          <div class="stack-badges">
+            <span class="sbadge en">HTML</span>
+            <span class="sbadge en">CSS</span>
+            <span class="sbadge en">JavaScript</span>
+            <span class="sbadge en">Python</span>
+            <span class="sbadge en">Android Studio</span>
+            <span class="sbadge en">CLIP STUDIO PAINT</span>
+          </div>
+
+          <div class="about-stat-row">
+            <div class="about-stat">
+              <div class="about-stat-num en">1</div>
+              <div class="about-stat-label">開発者</div>
+            </div>
+            <div class="about-stat">
+              <div class="about-stat-num en">¥0</div>
+              <div class="about-stat-label">月額費用</div>
+            </div>
+            <div class="about-stat">
+              <div class="about-stat-num en">∞</div>
+              <div class="about-stat-label">使用期限</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右: テキスト -->
+      <div class="about-text-side reveal from-right">
+        <div class="sec-eyebrow en">About</div>
+        <h2 class="sec-h2">開発者について<span class="sec-h2-en en">A solo dev building tools that matter.</span></h2>
+
+        <p style="margin-top:24px;">
+          Kiriya Toolsは、個人開発者が「自分が欲しいツール」を形にしたブランドです。高額なサブスクリプションの代わりに、シンプルで手頃な買い切りツールを提供しています。
+        </p>
+        <blockquote class="about-quote en">
+          "Kiriya Tools is a solo-developer brand building simple, affordable alternatives to expensive subscriptions. Every tool is designed to solve one problem well."
+        </blockquote>
+        <p>
+          Web・モバイル・デスクトップまで幅広く対応できる技術スタックを持ち、「使う人が迷わないツール」を軸に開発を続けています。
+        </p>
+        <p class="about-stack-note-en en" style="margin-top:12px;">
+          "From web apps to mobile — built with a versatile skill set."
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA BANNER
+============================================================ -->
+<section id="cta-banner">
+  <div class="cta-inner reveal">
+    <p class="cta-eyebrow en">Ready to start?</p>
+    <h2 class="cta-h2">サブスクを<span>卒業</span>しよう。</h2>
+    <p class="cta-desc">一度だけ支払って、ずっと使い続ける。それだけでいい。</p>
+    <div class="cta-btns">
+      <a href="#products" class="btn-glow en">
+        ツールを見てみる
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <!-- お問い合わせリンク: Googleフォームに差し替えてください -->
+      <a href="#contact-form" class="btn-outline-white">お問い合わせ / Contact</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo en">Kiriya<span>Tools</span></div>
+        <p class="footer-tagline">
+          月額不要の買い切りWebツール。<br>
+          <span class="en" style="font-style:italic; opacity:.7;">Simple tools you buy once and own forever.</span>
+        </p>
+      </div>
+
+      <div class="footer-contact-col">
+        <p class="footer-contact-label en">Contact</p>
+        <!-- お問い合わせリンク: href を GoogleフォームのURLに変更してください -->
+        <!-- 例: href="https://forms.gle/xxxxxxxxxxxx" -->
+        <a href="#contact-form" class="btn-footer-contact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          お問い合わせ / Contact
+        </a>
+
+        <!-- ===================================
+             X (Twitter) ソーシャルリンク
+             アカウントがある場合: コメントを外し、
+             href の末尾にアカウント名を追加してください。
+             例: href="https://x.com/kiriya_tools"
+             アカウントがない場合: このブロックをコメントアウトのままに。
+        =================================== -->
+        <!--
+        <div class="footer-social">
+          <a href="https://x.com/" class="social-btn en" target="_blank" rel="noopener noreferrer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.733-8.835L1.254 2.25H8.08l4.259 5.629L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+            @kiriya_tools
+          </a>
+        </div>
+        -->
+      </div>
+    </div>
+
+    <hr class="footer-hr" />
+
+    <div class="footer-bottom">
+      <p class="footer-copy en">© 2025 Kiriya Tools. All rights reserved.</p>
+      <p class="footer-note">個人開発・日本国内運営</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ---- NAV scroll ---- */
+  var navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function () {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  /* ---- Hamburger ---- */
+  window.toggleNav = function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  };
+  document.querySelectorAll('#navLinks a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      document.getElementById('navLinks').classList.remove('open');
+    });
+  });
+
+  /* ---- Particles ---- */
+  var container = document.getElementById('particles');
+  for (var i = 0; i < 28; i++) {
+    (function () {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      var size = Math.random() * 2.5 + 1;
+      p.style.cssText = [
+        'width:'  + size + 'px',
+        'height:' + size + 'px',
+        'left:'   + Math.random() * 100 + '%',
+        'animation-duration:' + (Math.random() * 14 + 8) + 's',
+        'animation-delay:'    + (Math.random() * 10) + 's',
+        'opacity:' + (Math.random() * .5 + .1),
+      ].join(';');
+      container.appendChild(p);
+    })();
+  }
+
+  /* ---- Scroll Reveal ---- */
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var revealObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    reveals.forEach(function (el) { revealObs.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add('visible'); });
+  }
+
+  /* ---- Nav active highlight on scroll ---- */
+  var sections = document.querySelectorAll('section[id]');
+  var navAs    = document.querySelectorAll('.nav-links a:not(.nav-pill)');
+  window.addEventListener('scroll', function () {
+    var scrollY = window.scrollY + 100;
+    sections.forEach(function (sec) {
+      var top    = sec.offsetTop;
+      var bottom = top + sec.offsetHeight;
+      var id     = sec.id;
+      var link   = document.querySelector('.nav-links a[href="#' + id + '"]');
+      if (link && scrollY >= top && scrollY < bottom) {
+        navAs.forEach(function (a) { a.style.color = ''; });
+        link.style.color = 'rgba(255,255,255,.95)';
+      }
+    });
+  }, { passive: true });
+
+  /* ---- Hero カード マウスパラックス ---- */
+  var stack = document.querySelector('.hero-card-stack');
+  if (stack) {
+    document.addEventListener('mousemove', function (e) {
+      var mx = (e.clientX / window.innerWidth  - .5) * 16;
+      var my = (e.clientY / window.innerHeight - .5) * 10;
+      stack.style.transform = 'rotateY(' + mx + 'deg) rotateX(' + (-my) + 'deg)';
+      stack.style.transition = 'transform .1s ease';
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>
