@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ========== RESET & BASE ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; }
 body {
@@ -17,7 +16,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ========== LICENSE GATE ========== */
 .license-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
@@ -53,6 +51,7 @@ body {
   box-shadow: 0 4px 12px rgba(37,99,235,0.3);
 }
 .license-box .btn-activate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+.license-box .btn-activate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .license-box .btn-demo {
   width: 100%; margin-top: 10px; padding: 12px; background: #f8fafc;
   color: #64748b; border: 1.5px solid #e2e8f0; border-radius: 10px;
@@ -69,7 +68,6 @@ body {
 .license-box .info a { color: #2563eb; text-decoration: none; }
 .license-box .info a:hover { text-decoration: underline; }
 
-/* ========== DEMO BANNER ========== */
 .demo-banner {
   background: linear-gradient(90deg, #f59e0b, #d97706); color: #fff;
   text-align: center; padding: 10px 20px; font-size: 0.82rem; font-weight: 600;
@@ -78,7 +76,6 @@ body {
 .demo-banner.show { display: block; }
 .demo-banner a { color: #fff; text-decoration: underline; margin-left: 8px; }
 
-/* ========== HEADER ========== */
 .app-header {
   background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
   color: #fff; padding: 18px 28px; display: flex; align-items: center; gap: 16px;
@@ -98,7 +95,6 @@ body {
 .app-header .license-badge.pro { background: #059669; color: #fff; }
 .app-header .license-badge.demo { background: #f59e0b; color: #fff; }
 
-/* ========== LAYOUT ========== */
 .container {
   display: grid; grid-template-columns: 440px 1fr;
   gap: 28px; padding: 28px; max-width: 1440px; margin: 0 auto;
@@ -107,7 +103,6 @@ body {
   .container { grid-template-columns: 1fr; }
 }
 
-/* ========== FORM PANEL ========== */
 .form-panel {
   background: #fff; border-radius: 14px; padding: 28px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
@@ -142,7 +137,6 @@ body {
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .row3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
 
-/* ========== SAVE / LOAD BUTTONS ========== */
 .save-load-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
 .btn-sm {
   padding: 7px 14px; font-size: 0.78rem; font-weight: 600; border-radius: 7px;
@@ -157,7 +151,6 @@ body {
 .btn-load-template { background: #f0f9ff; color: #0284c7; border-color: #bae6fd; }
 .btn-load-template:hover { background: #e0f2fe; }
 
-/* ========== ITEM TABLE ========== */
 .items-header {
   display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px;
 }
@@ -185,7 +178,6 @@ body {
   text-align: right; font-size: 0.8rem; color: #64748b; margin-top: 6px; font-weight: 500;
 }
 
-/* ========== TOTALS ========== */
 .totals {
   background: linear-gradient(135deg, #f0f9ff, #eff6ff);
   border: 1.5px solid #bae6fd; border-radius: 10px; padding: 16px; margin-top: 18px;
@@ -196,7 +188,6 @@ body {
   border-top: 2px solid #2563eb; margin-top: 8px; padding-top: 10px;
 }
 
-/* ========== WATERMARK TOGGLE ========== */
 .watermark-toggle {
   display: flex; align-items: center; gap: 10px; margin-top: 14px;
   padding: 12px 14px; background: #fffbeb; border: 1.5px solid #fde68a;
@@ -210,7 +201,6 @@ body {
 .watermark-toggle label { cursor: pointer; font-weight: 500; }
 .watermark-toggle .lock-note { font-size: 0.72rem; color: #b45309; margin-left: 4px; }
 
-/* ========== BUTTONS ========== */
 .actions { display: flex; gap: 10px; margin-top: 20px; }
 .btn-pdf {
   flex: 1; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff;
@@ -227,7 +217,6 @@ body {
 }
 .btn-clear:hover { background: #fee2e2; }
 
-/* ========== PREVIEW ========== */
 .preview-panel {
   background: #fff; border-radius: 14px; padding: 28px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
@@ -242,7 +231,6 @@ body {
   margin-bottom: 18px; font-weight: 600; letter-spacing: 0.03em;
 }
 
-/* ========== INVOICE (PREVIEW & PRINT) ========== */
 .invoice {
   max-width: 700px; margin: 0 auto; padding: 44px;
   border: 1px solid #e2e8f0; border-radius: 4px; background: #fff;
@@ -287,7 +275,6 @@ body {
   padding-top: 14px; border-top: 1px solid #e2e8f0;
 }
 
-/* ========== WATERMARK OVERLAY (DEMO) ========== */
 .watermark-overlay {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   pointer-events: none; overflow: hidden; z-index: 10;
@@ -298,7 +285,6 @@ body {
   white-space: nowrap; letter-spacing: 8px; user-select: none;
 }
 
-/* ========== PRINT ========== */
 @media print {
   body { background: #fff; }
   .app-header, .form-panel, .preview-label, .actions, .demo-banner { display: none !important; }
@@ -308,7 +294,6 @@ body {
   .watermark-overlay .wm-text { color: rgba(220, 38, 38, 0.06); }
 }
 
-/* ========== TOAST ========== */
 .toast {
   position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(10px);
   background: #0f172a; color: #fff; padding: 12px 28px; border-radius: 10px;
@@ -321,15 +306,14 @@ body {
 </head>
 <body>
 
-<!-- ===== LICENSE GATE ===== -->
 <div class="license-overlay" id="licenseOverlay">
   <div class="license-box">
     <div class="logo-area">¥</div>
     <h2>Invoice Generator</h2>
     <div class="subtitle">請求書自動作成ツール — ライセンス認証</div>
-    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" autocomplete="off" spellcheck="false">
+    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="50" autocomplete="off" spellcheck="false">
     <div class="error-msg" id="licenseError"></div>
-    <button class="btn-activate" onclick="activateLicense()">ライセンスを認証する</button>
+    <button class="btn-activate" id="activateBtn" onclick="activateLicense()">ライセンスを認証する</button>
     <button class="btn-demo" onclick="startDemo()">デモ版で試す（ウォーターマーク付き）</button>
     <div class="info">
       ライセンスキーは購入時のメールに記載されています。<br>
@@ -338,13 +322,11 @@ body {
   </div>
 </div>
 
-<!-- ===== DEMO BANNER ===== -->
 <div class="demo-banner" id="demoBanner">
   ⚠️ デモ版で使用中です。ウォーターマークが表示されます。
   <a href="https://wh77kmqp29.github.io/kiriya-tools/" target="_blank">製品版を購入 →</a>
 </div>
 
-<!-- ===== APP HEADER ===== -->
 <header class="app-header">
   <div class="logo">¥</div>
   <div>
@@ -355,7 +337,6 @@ body {
 </header>
 
 <div class="container">
-  <!-- ===== LEFT: FORM ===== -->
   <div class="form-panel">
 
     <div class="save-load-bar">
@@ -413,34 +394,29 @@ body {
       <textarea id="myContact" rows="3" placeholder="mail@example.com&#10;〇〇銀行 △△支店 普通 1234567"></textarea>
     </div>
 
-    <!-- Items -->
     <div class="items-header">
       <div class="section-title"><span class="icon">📦</span> 品目・明細</div>
       <button class="btn-add" onclick="addItem()">＋ 行を追加</button>
     </div>
     <div id="itemList"></div>
 
-    <!-- Notes -->
     <div class="form-group" style="margin-top:16px;">
       <label>備考</label>
       <textarea id="notes" rows="3" placeholder="お支払い方法やその他連絡事項"></textarea>
     </div>
 
-    <!-- Watermark Toggle -->
     <div class="watermark-toggle" id="watermarkToggleArea">
       <input type="checkbox" id="showWatermark" checked disabled>
       <label for="showWatermark">フッターに「Invoice Generator で作成」を表示する</label>
       <span class="lock-note" id="lockNote">🔒 製品版で解除可能</span>
     </div>
 
-    <!-- Buttons -->
     <div class="actions">
       <button class="btn-pdf" onclick="printInvoice()">🖨️ PDF出力 / 印刷</button>
       <button class="btn-clear" onclick="clearAll()">🗑️ クリア</button>
     </div>
   </div>
 
-  <!-- ===== RIGHT: PREVIEW ===== -->
   <div class="preview-panel">
     <div class="preview-label">▼ リアルタイムプレビュー（入力すると自動更新されます）</div>
     <div class="invoice" id="invoicePreview"></div>
@@ -453,15 +429,9 @@ body {
 (function () {
   "use strict";
 
-  /* ========== LICENSE SYSTEM ========== */
-  var licenseMode = "none"; // "none" | "demo" | "pro"
+  var licenseMode = "none";
+  var POLAR_ORG_ID = "ff9b0c8c-c690-4aa4-865f-9902dd92804b";
 
-  /*
-   * ライセンスキー検証
-   * キーのハッシュ値で照合するため、ソースを見てもキーは分からない。
-   * 新しいキーを追加するには: コンソールで hashKey("XXXX-XXXX-XXXX-XXXX") を実行し、
-   * 得られた値を VALID_HASHES に追加する。
-   */
   function hashKey(key) {
     var h = 0x811c9dc5;
     for (var i = 0; i < key.length; i++) {
@@ -471,11 +441,9 @@ body {
     return (h >>> 0).toString(16);
   }
 
-  // ハッシュ化されたライセンスキー（平文はソースに含まれない）
-  // 追加方法: ブラウザコンソールで hashKey("YOUR-KEY-HERE-1234") を実行し結果をここに追加
   var VALID_HASHES = [
-    "fc28e86a",  // 初回販売用キー1
-    "a3d7c912",  // 初回販売用キー2
+    "fc28e86a",
+    "a3d7c912",
   ];
 
   var DEMO_KEY = "DEMO-DEMO-DEMO-DEMO";
@@ -488,10 +456,10 @@ body {
     return false;
   }
 
-  /* ---------- LICENSE UI ---------- */
   window.activateLicense = function () {
     var input = document.getElementById("licenseInput");
     var errEl = document.getElementById("licenseError");
+    var btn = document.getElementById("activateBtn");
     var key = input.value.trim();
 
     if (!key) {
@@ -509,8 +477,35 @@ body {
       errEl.textContent = "これはデモキーです。下の「デモ版で試す」をご利用ください。";
       input.classList.add("error");
     } else {
-      errEl.textContent = "無効なライセンスキーです。入力を確認してください。";
-      input.classList.add("error");
+      // Polar.sh API で検証
+      btn.disabled = true;
+      btn.textContent = "認証中...";
+      errEl.textContent = "";
+      input.classList.remove("error");
+      fetch("https://api.polar.sh/v1/customer-portal/license-keys/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: key.trim(), organization_id: POLAR_ORG_ID })
+      })
+      .then(function(r) { if (!r.ok) throw new Error("invalid"); return r.json(); })
+      .then(function(data) {
+        if (data.status === "granted") {
+          licenseMode = "pro";
+          localStorage.setItem("inv_license", key.trim().toUpperCase());
+          unlockApp();
+        } else {
+          errEl.textContent = "無効なライセンスキーです。";
+          input.classList.add("error");
+        }
+      })
+      .catch(function() {
+        errEl.textContent = "無効なキーまたは接続エラーです。";
+        input.classList.add("error");
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = "ライセンスを認証する";
+      });
     }
   };
 
@@ -549,7 +544,6 @@ body {
     render();
   }
 
-  /* ---------- AUTO RESTORE LICENSE ---------- */
   function checkSavedLicense() {
     var saved = localStorage.getItem("inv_license");
     if (saved) {
@@ -559,17 +553,33 @@ body {
         unlockApp();
         return true;
       } else {
-        localStorage.removeItem("inv_license");
+        // ハッシュでは見つからないので Polar.sh API で再検証
+        fetch("https://api.polar.sh/v1/customer-portal/license-keys/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: saved.trim(), organization_id: POLAR_ORG_ID })
+        })
+        .then(function(r) { if (!r.ok) throw new Error("invalid"); return r.json(); })
+        .then(function(data) {
+          if (data.status === "granted") {
+            licenseMode = "pro";
+            unlockApp();
+          } else {
+            localStorage.removeItem("inv_license");
+          }
+        })
+        .catch(function() {
+          localStorage.removeItem("inv_license");
+        });
+        return false;
       }
     }
     return false;
   }
 
-  /* ========== APP STATE ========== */
   var items = [];
   var itemId = 0;
 
-  /* ---------- INIT ---------- */
   function init() {
     var today = new Date().toISOString().slice(0, 10);
     document.getElementById("invDate").value = today;
@@ -583,18 +593,15 @@ body {
     document.querySelector(".form-panel").addEventListener("input", render);
     document.getElementById("showWatermark").addEventListener("change", render);
 
-    // ライセンスキー入力欄でEnterキー対応
     document.getElementById("licenseInput").addEventListener("keydown", function (e) {
       if (e.key === "Enter") activateLicense();
     });
 
-    // 保存済みライセンスを自動復元
     if (!checkSavedLicense()) {
       render();
     }
   }
 
-  /* ---------- ITEMS ---------- */
   window.addItem = function () {
     items.push({ id: ++itemId, name: "", qty: 1, price: 0, taxRate: 10 });
     renderItems();
@@ -647,7 +654,6 @@ body {
     row.querySelector(".item-subtotal").textContent = "小計: ¥" + num(sub) + "（税: ¥" + num(tax) + "）";
   }
 
-  /* ---------- RENDER PREVIEW ---------- */
   function render() {
     var v = getValues();
     var subtotal = 0;
@@ -669,7 +675,6 @@ body {
 
     var html = "";
 
-    // デモ版ウォーターマーク（大きな透かし）
     if (isDemo) {
       html += '<div class="watermark-overlay"><div class="wm-text">SAMPLE</div></div>';
     }
@@ -746,7 +751,6 @@ body {
     document.getElementById("invoicePreview").innerHTML = html;
   }
 
-  /* ---------- GET FORM VALUES ---------- */
   function getValues() {
     return {
       invNumber:     document.getElementById("invNumber").value,
@@ -763,7 +767,6 @@ body {
     };
   }
 
-  /* ---------- SAVE / LOAD ISSUER ---------- */
   window.saveIssuer = function () {
     var data = {
       myName:    document.getElementById("myName").value,
@@ -787,7 +790,6 @@ body {
     showToast("自社情報を読み込みました");
   };
 
-  /* ---------- SAVE / LOAD TEMPLATE ---------- */
   window.saveTemplate = function () {
     var v = getValues();
     var data = { values: v, items: items };
@@ -818,12 +820,10 @@ body {
     showToast("テンプレートを復元しました");
   };
 
-  /* ---------- PRINT / PDF ---------- */
   window.printInvoice = function () {
     window.print();
   };
 
-  /* ---------- CLEAR ---------- */
   window.clearAll = function () {
     if (!confirm("すべての入力をクリアしますか？")) return;
     document.getElementById("invNumber").value = "";
@@ -843,7 +843,6 @@ body {
     showToast("入力をクリアしました（自社情報は保持）");
   };
 
-  /* ---------- UTILS ---------- */
   function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
   function num(n) { return n.toLocaleString("ja-JP"); }
   function nlToBr(s) { return s.replace(/\n/g, "<br>"); }
@@ -859,10 +858,8 @@ body {
     setTimeout(function () { t.classList.remove("show"); }, 2800);
   }
 
-  // hashKey関数をグローバルに公開（管理用：コンソールでキーのハッシュを生成できる）
   window.hashKey = hashKey;
 
-  /* ---------- START ---------- */
   document.addEventListener("DOMContentLoaded", init);
 })();
 </script>
