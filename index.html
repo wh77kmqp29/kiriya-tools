@@ -698,6 +698,11 @@ nav.scrolled {
   display: block;
   margin-top: 1px;
 }
+.pcard-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 .btn-detail {
   display: inline-flex;
   align-items: center;
@@ -717,6 +722,27 @@ nav.scrolled {
 .btn-detail:hover {
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 4px 20px var(--blue-glow);
+}
+.btn-demo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: .8rem;
+  padding: 10px 20px;
+  border-radius: 100px;
+  text-decoration: none;
+  background: transparent;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  box-shadow: none;
+  transition: transform .2s var(--spring), background .2s, color .2s;
+  white-space: nowrap;
+}
+.btn-demo:hover {
+  background: var(--blue-dim);
+  transform: translateY(-2px) scale(1.03);
 }
 .pcard--coming {
   border-style: dashed;
@@ -1272,6 +1298,9 @@ footer {
   .hero-card-stack{ display: none; }
   .hero-content   { grid-template-columns: 1fr; }
   .about-stat-row { grid-template-columns: repeat(3,1fr); }
+  .pcard-footer   { flex-direction: column; align-items: flex-start; }
+  .pcard-btns     { width: 100%; }
+  .pcard-btns a   { flex: 1; justify-content: center; }
 }
 @media (max-width: 480px) {
   .hero-cta-row { flex-direction: column; align-items: flex-start; }
@@ -1339,7 +1368,6 @@ footer {
         </div>
         <div class="hcard-price-row">
           <div class="hcard-price en">¥2,980<small>（税込）</small></div>
-          <!-- ★変更: Polar.sh チェックアウトリンク -->
           <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="hcard-buy-btn en" target="_blank">購入する →</a>
         </div>
       </div>
@@ -1412,15 +1440,17 @@ footer {
             <div class="pcard-price en">¥2,980</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
-          <!-- ★変更: Polar.sh チェックアウトリンク -->
-          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="btn-detail en" target="_blank">
-            購入する
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="pcard-btns">
+            <a href="invoice/index.html" class="btn-demo en">デモを試す</a>
+            <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="btn-detail en" target="_blank">
+              購入する
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </article>
 
-      <!-- ★ 商品2: HealthWork Log（新規追加） -->
+      <!-- ★ 商品2: HealthWork Log -->
       <article class="pcard reveal reveal-delay-2">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
@@ -1439,14 +1469,17 @@ footer {
             <div class="pcard-price en">¥1,480</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
-          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22b3215d-1fff-45e0-8b75-34750221ff08" class="btn-detail en" target="_blank">
-            購入する
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="pcard-btns">
+            <a href="health-worklog.html" class="btn-demo en">デモを試す</a>
+            <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22b3215d-1fff-45e0-8b75-34750221ff08" class="btn-detail en" target="_blank">
+              購入する
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </article>
 
-      <!-- ★ 商品3: LectureNote Business（新規追加） -->
+      <!-- ★ 商品3: LectureNote Business -->
       <article class="pcard reveal reveal-delay-3">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
@@ -1465,10 +1498,13 @@ footer {
             <div class="pcard-price en">¥1,980</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
-          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=c8b13c42-464c-487f-82fa-21974cbbb96d" class="btn-detail en" target="_blank">
-            購入する
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="pcard-btns">
+            <a href="lecturenote-business.html" class="btn-demo en">デモを試す</a>
+            <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=c8b13c42-464c-487f-82fa-21974cbbb96d" class="btn-detail en" target="_blank">
+              購入する
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </article>
 
@@ -1619,7 +1655,6 @@ footer {
           お問い合わせ / Contact
         </a>
 
-        <!-- ★変更: X リンクのコメントアウトを解除 -->
         <div class="footer-social">
           <a href="https://x.com/KiriyaTools" class="social-btn en" target="_blank" rel="noopener noreferrer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.733-8.835L1.254 2.25H8.08l4.259 5.629L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
