@@ -17,9 +17,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
 
 <style>
-/* ============================================================
-   RESET & TOKENS
-============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 16px; }
 
@@ -55,9 +52,6 @@ body {
 }
 .en { font-family: 'Inter', sans-serif; }
 
-/* ============================================================
-   NOISE TEXTURE OVERLAY
-============================================================ */
 body::before {
   content: '';
   position: fixed;
@@ -68,9 +62,6 @@ body::before {
   opacity: .4;
 }
 
-/* ============================================================
-   NAV
-============================================================ */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -156,9 +147,6 @@ nav.scrolled {
   transition: .3s;
 }
 
-/* ============================================================
-   HERO — DARK CINEMATIC
-============================================================ */
 #hero {
   position: relative;
   min-height: 100svh;
@@ -167,8 +155,6 @@ nav.scrolled {
   background: var(--dark);
   overflow: hidden;
 }
-
-/* 背景グリッド */
 .hero-grid-bg {
   position: absolute;
   inset: 0;
@@ -178,8 +164,6 @@ nav.scrolled {
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
 }
-
-/* オーブ光源 */
 .hero-orb {
   position: absolute;
   border-radius: 50%;
@@ -208,8 +192,6 @@ nav.scrolled {
   0%, 100% { transform: translateY(0) scale(1); }
   50%       { transform: translateY(-30px) scale(1.05); }
 }
-
-/* パーティクル */
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -228,7 +210,6 @@ nav.scrolled {
   90%  { opacity: 1; }
   100% { transform: translateY(-20px) translateX(30px); opacity: 0; }
 }
-
 .hero-content {
   position: relative;
   z-index: 2;
@@ -240,8 +221,6 @@ nav.scrolled {
   gap: 80px;
   align-items: center;
 }
-
-/* 左テキスト */
 .hero-text {}
 .hero-eyebrow {
   display: inline-flex;
@@ -266,7 +245,6 @@ nav.scrolled {
   animation: blink 2s ease-in-out infinite;
 }
 @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
-
 .hero-h1 {
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 900;
@@ -297,7 +275,6 @@ nav.scrolled {
   margin-bottom: 40px;
   max-width: 480px;
 }
-
 .hero-cta-row {
   display: flex;
   gap: 14px;
@@ -351,8 +328,6 @@ nav.scrolled {
   color: #fff;
   background: rgba(255,255,255,.05);
 }
-
-/* 右側 — フローティングカード */
 .hero-card-stack {
   position: relative;
   height: 420px;
@@ -471,7 +446,6 @@ nav.scrolled {
   white-space: nowrap;
 }
 .hcard-buy-btn:hover { transform: scale(1.05); }
-
 .hcard-stat-num {
   font-family: 'Inter', sans-serif;
   font-size: 1.6rem;
@@ -482,8 +456,6 @@ nav.scrolled {
   font-size: .72rem;
   color: rgba(255,255,255,.45);
 }
-
-/* スクロールヒント */
 .hero-scroll-hint {
   position: absolute;
   bottom: 36px;
@@ -525,9 +497,6 @@ nav.scrolled {
   color: rgba(255,255,255,.25);
 }
 
-/* ============================================================
-   MARQUEE STRIP
-============================================================ */
 .marquee-strip {
   background: linear-gradient(135deg, var(--blue) 0%, var(--indigo) 100%);
   padding: 14px 0;
@@ -561,9 +530,6 @@ nav.scrolled {
   color: rgba(255,255,255,.3);
 }
 
-/* ============================================================
-   SECTION BASE
-============================================================ */
 .section { padding: 120px 0; }
 .container {
   max-width: 1200px;
@@ -613,9 +579,6 @@ nav.scrolled {
   margin-top: 16px;
 }
 
-/* ============================================================
-   PRODUCTS
-============================================================ */
 #products { background: var(--off-white); }
 .products-layout {
   display: grid;
@@ -633,8 +596,6 @@ nav.scrolled {
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
-
-/* 商品カード */
 .pcard {
   background: var(--white);
   border: 1px solid var(--border);
@@ -757,7 +718,6 @@ nav.scrolled {
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 4px 20px var(--blue-glow);
 }
-/* Coming Soon カード */
 .pcard--coming {
   border-style: dashed;
   background: linear-gradient(135deg, #f8fafc, #f1f5f9);
@@ -793,9 +753,6 @@ nav.scrolled {
 .coming-title { font-size: 1rem; font-weight: 700; color: #94a3b8; }
 .coming-desc  { font-size: .82rem; color: #b0bec5; line-height: 1.6; }
 
-/* ============================================================
-   FEATURES — DARK BENTO GRID
-============================================================ */
 #features {
   background: var(--dark2);
   position: relative;
@@ -814,7 +771,6 @@ nav.scrolled {
 #features .sec-eyebrow { color: var(--cyan); }
 #features .sec-eyebrow::before { background: var(--cyan); }
 #features .sec-desc { color: rgba(255,255,255,.45); }
-
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -880,7 +836,6 @@ nav.scrolled {
   position: relative;
   z-index: 1;
 }
-/* 比較ビジュアル (ワイドカード内) */
 .compare-visual {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -922,7 +877,6 @@ nav.scrolled {
 }
 .compare-item:last-child { border-bottom: none; }
 .compare-item .ci { font-size: .8rem; flex-shrink: 0; }
-/* ミニ価格表示 */
 .bento-price-display {
   margin-top: 20px;
   display: flex;
@@ -963,9 +917,6 @@ nav.scrolled {
   z-index: 1;
 }
 
-/* ============================================================
-   ABOUT — SPLIT
-============================================================ */
 #about { background: var(--white); }
 .about-grid {
   display: grid;
@@ -1083,7 +1034,6 @@ nav.scrolled {
   color: rgba(255,255,255,.35);
   margin-top: 2px;
 }
-
 .about-text-side {}
 .about-text-side p {
   font-size: .95rem;
@@ -1113,9 +1063,6 @@ nav.scrolled {
   font-style: italic;
 }
 
-/* ============================================================
-   CTA BANNER
-============================================================ */
 #cta-banner {
   background: linear-gradient(135deg, var(--dark) 0%, #0d1840 100%);
   position: relative;
@@ -1175,9 +1122,6 @@ nav.scrolled {
   flex-wrap: wrap;
 }
 
-/* ============================================================
-   FOOTER
-============================================================ */
 footer {
   background: var(--dark);
   border-top: 1px solid rgba(255,255,255,.05);
@@ -1281,9 +1225,6 @@ footer {
   color: rgba(255,255,255,.15);
 }
 
-/* ============================================================
-   ANIMATIONS — SCROLL REVEAL
-============================================================ */
 .reveal {
   opacity: 0;
   transform: translateY(32px);
@@ -1299,9 +1240,6 @@ footer {
 .reveal-delay-2 { transition-delay: .2s; }
 .reveal-delay-3 { transition-delay: .3s; }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
 @media (max-width: 1024px) {
   .hero-content    { grid-template-columns: 1fr; gap: 60px; padding-top: 140px; }
   .hero-card-stack { height: 340px; }
@@ -1345,9 +1283,6 @@ footer {
 </head>
 <body>
 
-<!-- ============================================================
-     NAV
-============================================================ -->
 <nav id="navbar">
   <div class="nav-inner">
     <a href="#" class="nav-logo en"><span class="logo-k">Kiriya</span>Tools</a>
@@ -1363,9 +1298,6 @@ footer {
   </div>
 </nav>
 
-<!-- ============================================================
-     HERO
-============================================================ -->
 <section id="hero">
   <div class="hero-grid-bg"></div>
   <div class="hero-orb hero-orb-1"></div>
@@ -1374,7 +1306,6 @@ footer {
   <div class="hero-particles" id="particles"></div>
 
   <div class="hero-content">
-    <!-- テキスト -->
     <div class="hero-text">
       <div class="hero-eyebrow en">
         <span class="hero-eyebrow-dot"></span>
@@ -1396,7 +1327,6 @@ footer {
       </div>
     </div>
 
-    <!-- フローティングカード -->
     <div class="hero-card-stack">
       <div class="hcard hcard-main">
         <div class="hcard-label en">Featured Product</div>
@@ -1409,7 +1339,8 @@ footer {
         </div>
         <div class="hcard-price-row">
           <div class="hcard-price en">¥2,980<small>（税込）</small></div>
-          <a href="invoice/index.html" class="hcard-buy-btn en">今すぐ試す →</a>
+          <!-- ★変更: Polar.sh チェックアウトリンク -->
+          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="hcard-buy-btn en" target="_blank">購入する →</a>
         </div>
       </div>
       <div class="hcard hcard-stat1">
@@ -1429,12 +1360,8 @@ footer {
   </div>
 </section>
 
-<!-- ============================================================
-     MARQUEE
-============================================================ -->
 <div class="marquee-strip" aria-hidden="true">
   <div class="marquee-inner">
-    <!-- 2セット繰り返してシームレスに -->
     <span class="marquee-item en">Buy Once <span class="marquee-sep">✦</span></span>
     <span class="marquee-item">月額不要 <span class="marquee-sep">✦</span></span>
     <span class="marquee-item en">Own Forever <span class="marquee-sep">✦</span></span>
@@ -1454,9 +1381,6 @@ footer {
   </div>
 </div>
 
-<!-- ============================================================
-     PRODUCTS
-============================================================ -->
 <section id="products" class="section">
   <div class="container">
     <div class="products-header-row reveal">
@@ -1469,11 +1393,7 @@ footer {
 
     <div class="products-grid" style="margin-top: 48px;">
 
-      <!-- ===============================
-           商品カード（既存商品）
-           新しい商品を追加するときは、この .pcard ブロックをコピーして
-           products-grid の中に貼り付け、各値を書き換えてください。
-      ================================ -->
+      <!-- ★ 商品1: 請求書ツール -->
       <article class="pcard reveal reveal-delay-1">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
@@ -1492,53 +1412,70 @@ footer {
             <div class="pcard-price en">¥2,980</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
-          <!-- 請求書ツールのリンク（invoice/index.html に接続済み） -->
-          <a href="invoice/index.html" class="btn-detail en">
-            詳しく見る
+          <!-- ★変更: Polar.sh チェックアウトリンク -->
+          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="btn-detail en" target="_blank">
+            購入する
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
       </article>
-      <!-- 新しい商品カードをここにコピー -->
 
-      <!-- ===============================
-           Coming Soon カード 1
-           新商品が決まったら .pcard--coming を外して商品カードへ変換。
-      ================================ -->
-      <article class="pcard pcard--coming reveal reveal-delay-2">
+      <!-- ★ 商品2: HealthWork Log（新規追加） -->
+      <article class="pcard reveal reveal-delay-2">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
-          <div class="pcard-icon-wrap" style="background:#f1f5f9;">🔮</div>
-          <div class="coming-body">
-            <span class="coming-badge en">Coming Soon</span>
-            <p class="coming-title">Next Tool — 次のツール</p>
-            <p class="coming-desc">開発中。近日公開予定。どんなツールが欲しいか、ぜひリクエストを。</p>
+          <div class="pcard-icon-wrap">💚</div>
+          <p class="pcard-en en">HealthWork Log</p>
+          <h3 class="pcard-name">健康管理・業務日報ツール</h3>
+          <p class="pcard-desc">毎日の健康チェックと業務日報を一画面で管理。体調・睡眠・ストレス・スケジュールを記録し、月間ダッシュボードで傾向を可視化。</p>
+          <div class="pcard-tags">
+            <span class="ptag">買い切り</span>
+            <span class="ptag">健康管理</span>
+            <span class="ptag">業務日報</span>
           </div>
+        </div>
+        <div class="pcard-footer">
+          <div>
+            <div class="pcard-price en">¥1,480</div>
+            <span class="pcard-price-note">税込・買い切り・永久利用</span>
+          </div>
+          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22b3215d-1fff-45e0-8b75-34750221ff08" class="btn-detail en" target="_blank">
+            購入する
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </div>
       </article>
 
-      <!-- ===============================
-           Coming Soon カード 2
-      ================================ -->
-      <article class="pcard pcard--coming reveal reveal-delay-3">
+      <!-- ★ 商品3: LectureNote Business（新規追加） -->
+      <article class="pcard reveal reveal-delay-3">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
-          <div class="pcard-icon-wrap" style="background:#f1f5f9;">💡</div>
-          <div class="coming-body">
-            <span class="coming-badge en">Coming Soon</span>
-            <p class="coming-title">New Idea — 企画中</p>
-            <p class="coming-desc">アイデア募集中。X（Twitter）でリクエストを受け付けています。</p>
+          <div class="pcard-icon-wrap">📋</div>
+          <p class="pcard-en en">LectureNote Business</p>
+          <h3 class="pcard-name">議事録・研修メモツール</h3>
+          <p class="pcard-desc">会議・研修・1on1の記録を構造化して保存。アクションアイテム管理、PDF出力、Markdownエクスポート、週次レポート生成に対応。</p>
+          <div class="pcard-tags">
+            <span class="ptag">買い切り</span>
+            <span class="ptag">議事録</span>
+            <span class="ptag">PDF出力</span>
           </div>
+        </div>
+        <div class="pcard-footer">
+          <div>
+            <div class="pcard-price en">¥1,980</div>
+            <span class="pcard-price-note">税込・買い切り・永久利用</span>
+          </div>
+          <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=c8b13c42-464c-487f-82fa-21974cbbb96d" class="btn-detail en" target="_blank">
+            購入する
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </div>
       </article>
 
-    </div><!-- /products-grid -->
+    </div>
   </div>
 </section>
 
-<!-- ============================================================
-     FEATURES — DARK BENTO
-============================================================ -->
 <section id="features" class="section">
   <div class="container">
     <div class="reveal">
@@ -1547,8 +1484,6 @@ footer {
     </div>
 
     <div class="bento-grid">
-
-      <!-- ワイド: 買い切り比較 -->
       <div class="bento-card bento-wide reveal reveal-delay-1">
         <span class="bento-icon">💰</span>
         <p class="bento-en en">One-Time Price</p>
@@ -1564,7 +1499,7 @@ footer {
           </div>
           <div class="compare-col compare-col--good">
             <div class="compare-head en">Kiriya Tools</div>
-            <div class="compare-item"><span class="ci">✓</span> 買い切り ¥2,980</div>
+            <div class="compare-item"><span class="ci">✓</span> 買い切り ¥1,480〜</div>
             <div class="compare-item"><span class="ci">✓</span> 2年目以降 ¥0</div>
             <div class="compare-item"><span class="ci">✓</span> 解約不要・永久利用</div>
             <div class="compare-item"><span class="ci">✓</span> 価格固定・追加なし</div>
@@ -1572,7 +1507,6 @@ footer {
         </div>
       </div>
 
-      <!-- シンプル設計 -->
       <div class="bento-card reveal reveal-delay-2">
         <span class="bento-icon">⚡</span>
         <p class="bento-en en">Simple by Design</p>
@@ -1584,7 +1518,6 @@ footer {
         </div>
       </div>
 
-      <!-- プライバシー -->
       <div class="bento-card reveal reveal-delay-3">
         <span class="bento-icon">🔒</span>
         <p class="bento-en en">Privacy First</p>
@@ -1595,25 +1528,18 @@ footer {
           Data stays on your device
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     ABOUT
-============================================================ -->
 <section id="about" class="section">
   <div class="container">
     <div class="about-grid">
-
-      <!-- 左: ビジュアルカード -->
       <div class="about-visual reveal from-left">
         <div class="about-card-bg">
           <div class="about-avatar">⚙️</div>
           <div class="about-card-name en">Kiriya Tools</div>
           <div class="about-card-role">Solo Developer · Japan</div>
-
           <div class="stack-title en">Tech Stack</div>
           <div class="stack-badges">
             <span class="sbadge en">HTML</span>
@@ -1623,7 +1549,6 @@ footer {
             <span class="sbadge en">Android Studio</span>
             <span class="sbadge en">CLIP STUDIO PAINT</span>
           </div>
-
           <div class="about-stat-row">
             <div class="about-stat">
               <div class="about-stat-num en">1</div>
@@ -1641,11 +1566,9 @@ footer {
         </div>
       </div>
 
-      <!-- 右: テキスト -->
       <div class="about-text-side reveal from-right">
         <div class="sec-eyebrow en">About</div>
         <h2 class="sec-h2">開発者について<span class="sec-h2-en en">A solo dev building tools that matter.</span></h2>
-
         <p style="margin-top:24px;">
           Kiriya Toolsは、個人開発者が「自分が欲しいツール」を形にしたブランドです。高額なサブスクリプションの代わりに、シンプルで手頃な買い切りツールを提供しています。
         </p>
@@ -1659,14 +1582,10 @@ footer {
           "From web apps to mobile — built with a versatile skill set."
         </p>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     CTA BANNER
-============================================================ -->
 <section id="cta-banner">
   <div class="cta-inner reveal">
     <p class="cta-eyebrow en">Ready to start?</p>
@@ -1677,15 +1596,11 @@ footer {
         ツールを見てみる
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
-      <!-- お問い合わせリンク: Googleフォームに差し替えてください -->
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSezmPEm1jnzyt809QI8kMdUMxC5tiMpq0MYaSopOfS3qmJUug/viewform" class="btn-outline-white">お問い合わせ / Contact</a>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     FOOTER
-============================================================ -->
 <footer>
   <div class="container">
     <div class="footer-grid">
@@ -1699,28 +1614,18 @@ footer {
 
       <div class="footer-contact-col">
         <p class="footer-contact-label en">Contact</p>
-        <!-- お問い合わせリンク: href を GoogleフォームのURLに変更してください -->
-        <!-- 例: href="https://forms.gle/xxxxxxxxxxxx" -->
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSezmPEm1jnzyt809QI8kMdUMxC5tiMpq0MYaSopOfS3qmJUug/viewform" class="btn-footer-contact">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           お問い合わせ / Contact
         </a>
 
-        <!-- ===================================
-             X (Twitter) ソーシャルリンク
-             アカウントがある場合: コメントを外し、
-             href の末尾にアカウント名を追加してください。
-             例: href="https://x.com/kiriya_tools"
-             アカウントがない場合: このブロックをコメントアウトのままに。
-        =================================== -->
-        <!--
+        <!-- ★変更: X リンクのコメントアウトを解除 -->
         <div class="footer-social">
-          <a href="https://x.com/" class="social-btn en" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/KiriyaTools" class="social-btn en" target="_blank" rel="noopener noreferrer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.733-8.835L1.254 2.25H8.08l4.259 5.629L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
-            @kiriya_tools
+            @KiriyaTools
           </a>
         </div>
-        -->
       </div>
     </div>
 
@@ -1733,20 +1638,15 @@ footer {
   </div>
 </footer>
 
-<!-- ============================================================
-     JAVASCRIPT
-============================================================ -->
 <script>
 (function () {
   'use strict';
 
-  /* ---- NAV scroll ---- */
   var navbar = document.getElementById('navbar');
   window.addEventListener('scroll', function () {
     navbar.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
 
-  /* ---- Hamburger ---- */
   window.toggleNav = function () {
     document.getElementById('navLinks').classList.toggle('open');
   };
@@ -1756,7 +1656,6 @@ footer {
     });
   });
 
-  /* ---- Particles ---- */
   var container = document.getElementById('particles');
   for (var i = 0; i < 28; i++) {
     (function () {
@@ -1775,7 +1674,6 @@ footer {
     })();
   }
 
-  /* ---- Scroll Reveal ---- */
   var reveals = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
     var revealObs = new IntersectionObserver(function (entries) {
@@ -1791,7 +1689,6 @@ footer {
     reveals.forEach(function (el) { el.classList.add('visible'); });
   }
 
-  /* ---- Nav active highlight on scroll ---- */
   var sections = document.querySelectorAll('section[id]');
   var navAs    = document.querySelectorAll('.nav-links a:not(.nav-pill)');
   window.addEventListener('scroll', function () {
@@ -1808,7 +1705,6 @@ footer {
     });
   }, { passive: true });
 
-  /* ---- Hero カード マウスパラックス ---- */
   var stack = document.querySelector('.hero-card-stack');
   if (stack) {
     document.addEventListener('mousemove', function (e) {
