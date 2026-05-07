@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DocFlow — 見積書・納品書・領収書ジェネレーター</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue','Noto Sans JP',sans-serif;background:#f5f5f7;color:#1d1d1f;min-height:100vh}
+
+/* ===== HEADER ===== */
+.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{font-size:1.2rem;font-weight:800;color:#1d1d1f}
+.logo span{color:#0071e3}
+.header-right{display:flex;align-items:center;gap:12px}
+.license-status{font-size:.75rem;padding:4px 12px;border-radius:100px;font-weight:600}
+.license-status.demo{background:#fff3cd;color:#856404}
+.license-status.active{background:#d4edda;color:#155724}
+.btn-activate{background:#0071e3;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:.8rem;cursor:pointer;font-weight:600}
+.btn-activate:hover{background:#005bb5}
+
+/* ===== LICENSE MODAL ===== */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:16px;padding:32px;max-width:480px;width:90%;text-align:center}
+.modal h2{font-size:1.2rem;margin-bottom:16px}
+.modal input{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:.9rem;margin-bottom:12px}
+.modal .btn-submit{background:#0071e3;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:600;width:100%}
+.modal .btn-cancel{background:none;border:none;color:#888;cursor:pointer;margin-top:12px;font-size:.85rem}
+.modal .purchase-links{margin-top:20px;padding-top:16px;border-top:1px solid #eee;text-align:left}
+.modal .purchase-links p{font-size:.8rem;color:#666;margin-bottom:8px}
+.modal .purchase-links a{display:block;padding:8px 0;color:#0071e3;text-decoration:none;font-size:.85rem;font-weight:600}
+
+/* ===== TAB NAV ===== */
+.tab-nav{display:flex;gap:0;background:#fff;border-bottom:1px solid #e0e0e0;padding:0 24px}
+.tab-btn{padding:14px 24px;border:none;background:none;font-size:.9rem;cursor:pointer;color:#888;font-weight:600;border-bottom:3px solid transparent;transition:all .2s}
+.tab-btn.active{color:#0071e3;border-bottom-color:#0071e3}
+.tab-btn:disabled{color:#ccc;cursor:not-allowed}
+.tab-btn .lock-icon{font-size:.7rem;margin-left:4px}
+
+/* ===== MAIN CONTENT ===== */
+.main{max-width:900px;margin:24px auto;padding:0 24px}
+.doc-section{display:none}
+.doc-section.active{display:block}
+
+/* ===== FORM STYLES ===== */
+.card{background:#fff;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card h3{font-size:.95rem;font-weight:700;margin-bottom:16px;color:#333}
+.form-row{display:flex;gap:12px;margin-bottom:12px}
+.form-group{flex:1;display:flex;flex-direction:column}
+.form-group label{font-size:.75rem;color:#888;margin-bottom:4px;font-weight:600}
+.form-group input,.form-group textarea,.form-group select{padding:10px;border:1px solid #ddd;border-radius:8px;font-size:.85rem;font-family:inherit}
+.form-group textarea{resize:vertical;min-height:60px}
+
+/* ===== ITEMS TABLE ===== */
+.items-table{width:100%;border-collapse:collapse;margin-bottom:12px}
+.items-table th{background:#f8f8f8;padding:10px;font-size:.75rem;text-align:left;color:#666;font-weight:600}
+.items-table td{padding:8px;border-bottom:1px solid #f0f0f0}
+.items-table input{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:.85rem}
+.items-table .col-del{width:36px;text-align:center}
+.btn-del-row{background:#ff3b30;color:#fff;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:.8rem}
+.btn-add-row{background:none;border:1px dashed #0071e3;color:#0071e3;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600}
+.btn-add-row:hover{background:#f0f7ff}
+
+/* ===== TOTALS ===== */
+.totals{text-align:right;padding:12px 0}
+.totals .row{display:flex;justify-content:flex-end;gap:24px;margin-bottom:6px;font-size:.9rem}
+.totals .row.total{font-weight:800;font-size:1.1rem;color:#0071e3}
+.totals .label{color:#888}
+
+/* ===== ACTION BUTTONS ===== */
+.actions{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.btn-primary{background:#0071e3;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:700}
+.btn-primary:hover{background:#005bb5}
+.btn-secondary{background:#fff;color:#0071e3;border:1px solid #0071e3;padding:12px 28px;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:700}
+.btn-secondary:hover{background:#f0f7ff}
+.btn-convert{background:#34c759;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:700}
+.btn-convert:hover{background:#2da44e}
+
+/* ===== CLIENT DICTIONARY ===== */
+.client-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.client-bar select{flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:.85rem}
+.btn-save-client{background:#f0f0f0;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:600}
+
+/* ===== HISTORY ===== */
+.history-list{list-style:none}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #f0f0f0;font-size:.85rem}
+.history-item:hover{background:#f8f8f8}
+.history-meta{color:#888;font-size:.75rem}
+.history-actions{display:flex;gap:8px}
+.history-actions button{background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer}
+
+/* ===== WATERMARK ===== */
+.watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:5rem;color:rgba(255,0,0,.07);font-weight:900;pointer-events:none;z-index:50;white-space:nowrap}
+
+/* ===== DEMO COUNTER ===== */
+.demo-counter{background:#fff3cd;color:#856404;padding:8px 16px;border-radius:8px;font-size:.8rem;text-align:center;margin-bottom:16px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .form-row{flex-direction:column}
+  .tab-btn{padding:10px 14px;font-size:.8rem}
+  .actions{flex-direction:column}
+  .header{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== WATERMARK (demo only) ===== -->
+<div class="watermark" id="watermark">DEMO</div>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo"><span>Doc</span>Flow</div>
+  </div>
+  <div class="header-right">
+    <span class="license-status demo" id="licenseStatus">デモ版</span>
+    <button class="btn-activate" onclick="openModal()">ライセンス認証</button>
+  </div>
+</div>
+
+<!-- ===== LICENSE MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>ライセンスキーを入力</h2>
+    <input type="text" id="licenseInput" placeholder="XXXX-XXXX-XXXX-XXXX">
+    <button class="btn-submit" onclick="activateLicense()">認証する</button>
+    <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+    <div class="purchase-links">
+      <p>ライセンスをお持ちでない方：</p>
+      <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=4ac115ed-a831-4287-b010-bb2f68f0c7fd" target="_blank">見積書ジェネレーター（¥980）</a>
+      <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=2497caee-8942-4e65-9a86-8769985199d5" target="_blank">納品書ジェネレーター（¥980）</a>
+      <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=08c791cd-66ea-4617-9416-9a8316aae96f" target="_blank">領収書ジェネレーター（¥980）</a>
+      <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22dafa1b-f062-41f3-bfce-477e3064bf26" target="_blank">DocFlow 書類セット（¥1,980）← お得！</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB NAV ===== -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="estimate" onclick="switchTab('estimate')">見積書</button>
+  <button class="tab-btn" data-tab="delivery" onclick="switchTab('delivery')">納品書</button>
+  <button class="tab-btn" data-tab="receipt" onclick="switchTab('receipt')">領収書</button>
+  <button class="tab-btn" data-tab="history" onclick="switchTab('history')">📋 履歴</button>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+  <!-- DEMO COUNTER -->
+  <div class="demo-counter" id="demoCounter" style="display:none">
+    デモ版：残り <span id="demoRemain">2</span> 回出力できます
+  </div>
+
+  <!-- ==================== 見積書 ==================== -->
+  <div class="doc-section active" id="sec-estimate">
+
+    <!-- 取引先選択 -->
+    <div class="card">
+      <h3>取引先を選択</h3>
+      <div class="client-bar">
+        <select id="clientSelect-estimate" onchange="loadClient('estimate')">
+          <option value="">-- 登録済みの取引先 --</option>
+        </select>
+        <button class="btn-save-client" onclick="saveClient('estimate')">現在の入力を保存</button>
+      </div>
+    </div>
+
+    <!-- 基本情報 -->
+    <div class="card">
+      <h3>基本情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>書類番号</label>
+          <input type="text" id="est-docnum" placeholder="EST-001">
+        </div>
+        <div class="form-group">
+          <label>発行日</label>
+          <input type="date" id="est-date">
+        </div>
+        <div class="form-group">
+          <label>有効期限</label>
+          <input type="date" id="est-expiry">
+        </div>
+      </div>
+    </div>
+
+    <!-- 自社情報 -->
+    <div class="card">
+      <h3>自社情報（自動保存されます）</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>会社名 / 屋号</label>
+          <input type="text" id="est-myname" placeholder="例：山田デザイン事務所" oninput="saveMyInfo()">
+        </div>
+        <div class="form-group">
+          <label>郵便番号・住所</label>
+          <input type="text" id="est-myaddr" placeholder="例：〒150-0001 東京都..." oninput="saveMyInfo()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="text" id="est-mytel" placeholder="例：03-1234-5678" oninput="saveMyInfo()">
+        </div>
+        <div class="form-group">
+          <label>メールアドレス</label>
+          <input type="text" id="est-myemail" placeholder="例：info@example.com" oninput="saveMyInfo()">
+        </div>
+        <div class="form-group">
+          <label>登録番号</label>
+          <input type="text" id="est-myregnum" placeholder="例：T1234567890123" oninput="saveMyInfo()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 取引先情報 -->
+    <div class="card">
+      <h3>取引先情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>取引先名</label>
+          <input type="text" id="est-clientname" placeholder="例：株式会社サンプル">
+        </div>
+        <div class="form-group">
+          <label>担当者名</label>
+          <input type="text" id="est-clientperson" placeholder="例：田中太郎">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" id="est-clientaddr" placeholder="例：〒100-0001 東京都...">
+        </div>
+      </div>
+    </div>
+
+    <!-- 品目 -->
+    <div class="card">
+      <h3>品目</h3>
+      <table class="items-table">
+        <thead>
+          <tr><th>品名</th><th style="width:80px">数量</th><th style="width:120px">単価</th><th style="width:120px">金額</th><th class="col-del"></th></tr>
+        </thead>
+        <tbody id="est-items">
+          <tr>
+            <td><input type="text" placeholder="品名"></td>
+            <td><input type="number" value="1" min="1" oninput="calcRow(this)"></td>
+            <td><input type="number" value="0" min="0" oninput="calcRow(this)"></td>
+            <td><input type="text" readonly value="¥0"></td>
+            <td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addRow('est-items')">＋ 行を追加</button>
+      <div class="totals" id="est-totals">
+        <div class="row"><span class="label">小計</span><span id="est-subtotal">¥0</span></div>
+        <div class="row"><span class="label">消費税（10%）</span><span id="est-tax">¥0</span></div>
+        <div class="row total"><span class="label">合計</span><span id="est-total">¥0</span></div>
+      </div>
+    </div>
+
+    <!-- 備考 -->
+    <div class="card">
+      <h3>備考</h3>
+      <div class="form-group">
+        <textarea id="est-note" placeholder="備考・特記事項"></textarea>
+      </div>
+    </div>
+
+    <!-- アクション -->
+    <div class="actions">
+      <button class="btn-primary" onclick="exportPDF('estimate')">PDF出力</button>
+      <button class="btn-secondary" onclick="previewDoc('estimate')">プレビュー</button>
+      <button class="btn-convert" onclick="convertDoc('estimate','delivery')">→ 納品書に変換</button>
+      <button class="btn-secondary" onclick="clearForm('estimate')">クリア</button>
+    </div>
+  </div>
+
+  <!-- ==================== 納品書 ==================== -->
+  <div class="doc-section" id="sec-delivery">
+
+    <div class="card">
+      <h3>取引先を選択</h3>
+      <div class="client-bar">
+        <select id="clientSelect-delivery" onchange="loadClient('delivery')">
+          <option value="">-- 登録済みの取引先 --</option>
+        </select>
+        <button class="btn-save-client" onclick="saveClient('delivery')">現在の入力を保存</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>基本情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>書類番号</label>
+          <input type="text" id="dlv-docnum" placeholder="DLV-001">
+        </div>
+        <div class="form-group">
+          <label>発行日</label>
+          <input type="date" id="dlv-date">
+        </div>
+        <div class="form-group">
+          <label>納品日</label>
+          <input type="date" id="dlv-delivdate">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>自社情報（自動保存されます）</h3>
+      <div class="form-row">
+        <div class="form-group"><label>会社名 / 屋号</label><input type="text" id="dlv-myname" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>住所</label><input type="text" id="dlv-myaddr" oninput="saveMyInfo()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>電話番号</label><input type="text" id="dlv-mytel" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>メール</label><input type="text" id="dlv-myemail" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>登録番号</label><input type="text" id="dlv-myregnum" oninput="saveMyInfo()"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>取引先情報</h3>
+      <div class="form-row">
+        <div class="form-group"><label>取引先名</label><input type="text" id="dlv-clientname"></div>
+        <div class="form-group"><label>担当者名</label><input type="text" id="dlv-clientperson"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>住所</label><input type="text" id="dlv-clientaddr"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>品目</h3>
+      <table class="items-table">
+        <thead><tr><th>品名</th><th style="width:80px">数量</th><th style="width:120px">単価</th><th style="width:120px">金額</th><th class="col-del"></th></tr></thead>
+        <tbody id="dlv-items">
+          <tr>
+            <td><input type="text" placeholder="品名"></td>
+            <td><input type="number" value="1" min="1" oninput="calcRow(this)"></td>
+            <td><input type="number" value="0" min="0" oninput="calcRow(this)"></td>
+            <td><input type="text" readonly value="¥0"></td>
+            <td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addRow('dlv-items')">＋ 行を追加</button>
+      <div class="totals" id="dlv-totals">
+        <div class="row"><span class="label">小計</span><span id="dlv-subtotal">¥0</span></div>
+        <div class="row"><span class="label">消費税（10%）</span><span id="dlv-tax">¥0</span></div>
+        <div class="row total"><span class="label">合計</span><span id="dlv-total">¥0</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>備考</h3>
+      <div class="form-group"><textarea id="dlv-note" placeholder="備考・特記事項"></textarea></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="exportPDF('delivery')">PDF出力</button>
+      <button class="btn-secondary" onclick="previewDoc('delivery')">プレビュー</button>
+      <button class="btn-convert" onclick="convertDoc('delivery','receipt')">→ 領収書に変換</button>
+      <button class="btn-secondary" onclick="clearForm('delivery')">クリア</button>
+    </div>
+  </div>
+
+  <!-- ==================== 領収書 ==================== -->
+  <div class="doc-section" id="sec-receipt">
+
+    <div class="card">
+      <h3>取引先を選択</h3>
+      <div class="client-bar">
+        <select id="clientSelect-receipt" onchange="loadClient('receipt')">
+          <option value="">-- 登録済みの取引先 --</option>
+        </select>
+        <button class="btn-save-client" onclick="saveClient('receipt')">現在の入力を保存</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>基本情報</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>書類番号</label>
+          <input type="text" id="rct-docnum" placeholder="RCT-001">
+        </div>
+        <div class="form-group">
+          <label>発行日</label>
+          <input type="date" id="rct-date">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>但し書き</label>
+          <input type="text" id="rct-description" placeholder="例：ウェブサイト制作費として">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>自社情報（自動保存されます）</h3>
+      <div class="form-row">
+        <div class="form-group"><label>会社名 / 屋号</label><input type="text" id="rct-myname" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>住所</label><input type="text" id="rct-myaddr" oninput="saveMyInfo()"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>電話番号</label><input type="text" id="rct-mytel" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>メール</label><input type="text" id="rct-myemail" oninput="saveMyInfo()"></div>
+        <div class="form-group"><label>登録番号</label><input type="text" id="rct-myregnum" oninput="saveMyInfo()"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>取引先情報</h3>
+      <div class="form-row">
+        <div class="form-group"><label>取引先名</label><input type="text" id="rct-clientname"></div>
+        <div class="form-group"><label>担当者名</label><input type="text" id="rct-clientperson"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>住所</label><input type="text" id="rct-clientaddr"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>品目</h3>
+      <table class="items-table">
+        <thead><tr><th>品名</th><th style="width:80px">数量</th><th style="width:120px">単価</th><th style="width:120px">金額</th><th class="col-del"></th></tr></thead>
+        <tbody id="rct-items">
+          <tr>
+            <td><input type="text" placeholder="品名"></td>
+            <td><input type="number" value="1" min="1" oninput="calcRow(this)"></td>
+            <td><input type="number" value="0" min="0" oninput="calcRow(this)"></td>
+            <td><input type="text" readonly value="¥0"></td>
+            <td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addRow('rct-items')">＋ 行を追加</button>
+      <div class="totals" id="rct-totals">
+        <div class="row"><span class="label">小計</span><span id="rct-subtotal">¥0</span></div>
+        <div class="row"><span class="label">消費税（10%）</span><span id="rct-tax">¥0</span></div>
+        <div class="row total"><span class="label">合計</span><span id="rct-total">¥0</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>備考</h3>
+      <div class="form-group"><textarea id="rct-note" placeholder="備考・特記事項"></textarea></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="exportPDF('receipt')">PDF出力</button>
+      <button class="btn-secondary" onclick="previewDoc('receipt')">プレビュー</button>
+      <button class="btn-secondary" onclick="clearForm('receipt')">クリア</button>
+    </div>
+  </div>
+
+  <!-- ==================== 履歴 ==================== -->
+  <div class="doc-section" id="sec-history">
+    <div class="card">
+      <h3>📋 保存済みドキュメント</h3>
+      <p id="historyEmpty" style="color:#888;font-size:.85rem;">まだ保存されたドキュメントはありません。</p>
+      <ul class="history-list" id="historyList"></ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================================================
+   DocFlow — JavaScript
+   =================================================== */
+
+// ─── 定数 ───
+var PRODUCT_IDS = {
+  estimate:  '4ac115ed-a831-4287-b010-bb2f68f0c7fd',
+  delivery:  '2497caee-8942-4e65-9a86-8769985199d5',
+  receipt:   '08c791cd-66ea-4617-9416-9a8316aae96f',
+  bundle:    '22dafa1b-f062-41f3-bfce-477e3064bf26'
+};
+var DEMO_LIMIT = 2; // 各書類タイプごと2回まで
+var PREFIXES = {estimate:'est', delivery:'dlv', receipt:'rct'};
+var DOC_NAMES = {estimate:'見積書', delivery:'納品書', receipt:'領収書'};
+
+// ─── 状態管理 ───
+var licenseType = null; // null=demo, 'estimate','delivery','receipt','bundle'
+var demoCount = JSON.parse(localStorage.getItem('df_demo') || '{"estimate":0,"delivery":0,"receipt":0}');
+
+// ─── 初期化 ───
+window.onload = function(){
+  loadMyInfoToAll();
+  loadClientsToAll();
+  checkSavedLicense();
+  setTodayDates();
+  updateDemoUI();
+};
+
+// ─── 日付初期値 ───
+function setTodayDates(){
+  var today = new Date().toISOString().split('T')[0];
+  ['est-date','dlv-date','rct-date'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && !el.value) el.value = today;
+  });
+}
+
+// ===================================================
+//  ライセンス認証
+// ===================================================
+function openModal(){ document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+
+function activateLicense(){
+  var key = document.getElementById('licenseInput').value.trim();
+  if(!key){ alert('ライセンスキーを入力してください'); return; }
+
+  // Polar.sh API でキー検証
+  fetch('https://api.polar.sh/v1/customer-portal/license-keys/validate', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({key:key, organization_id:'kiriya-tools'})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.validated){
+      var pid = data.license_key && data.license_key.benefit && data.license_key.benefit.product_id;
+      if(pid === PRODUCT_IDS.bundle){
+        licenseType = 'bundle';
+      } else if(pid === PRODUCT_IDS.estimate){
+        licenseType = 'estimate';
+      } else if(pid === PRODUCT_IDS.delivery){
+        licenseType = 'delivery';
+      } else if(pid === PRODUCT_IDS.receipt){
+        licenseType = 'receipt';
+      } else {
+        licenseType = 'bundle'; // fallback
+      }
+      localStorage.setItem('df_license', JSON.stringify({key:key, type:licenseType}));
+      updateLicenseUI();
+      closeModal();
+      alert('認証成功！');
+    } else {
+      alert('無効なライセンスキーです。');
+    }
+  })
+  .catch(function(){
+    alert('認証に失敗しました。ネットワーク接続を確認してください。');
+  });
+}
+
+function checkSavedLicense(){
+  var saved = JSON.parse(localStorage.getItem('df_license') || 'null');
+  if(saved && saved.type){
+    licenseType = saved.type;
+    updateLicenseUI();
+  }
+}
+
+function updateLicenseUI(){
+  var el = document.getElementById('licenseStatus');
+  var wm = document.getElementById('watermark');
+  if(licenseType){
+    if(licenseType === 'bundle'){
+      el.textContent = '製品版（全書類）';
+    } else {
+      el.textContent = '製品版（' + DOC_NAMES[licenseType] + '）';
+    }
+    el.className = 'license-status active';
+    wm.style.display = 'none';
+  } else {
+    el.textContent = 'デモ版';
+    el.className = 'license-status demo';
+    wm.style.display = 'block';
+  }
+  updateTabAccess();
+  updateDemoUI();
+}
+
+function updateTabAccess(){
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(function(btn){
+    var tab = btn.getAttribute('data-tab');
+    if(tab === 'history') return;
+    btn.disabled = false;
+    btn.querySelector('.lock-icon') && btn.querySelector('.lock-icon').remove();
+    // 単品ライセンスの場合、他のタブを制限（デモでは全タブ開放）
+    if(licenseType && licenseType !== 'bundle' && tab !== licenseType){
+      // 単品購入者は他のタブもデモとして使える（出力制限あり）
+    }
+  });
+}
+
+// ===================================================
+//  デモ制限
+// ===================================================
+function updateDemoUI(){
+  var counter = document.getElementById('demoCounter');
+  if(licenseType === 'bundle'){
+    counter.style.display = 'none';
+    return;
+  }
+  counter.style.display = 'block';
+  var tab = getCurrentTab();
+  if(tab === 'history'){ counter.style.display = 'none'; return; }
+
+  if(licenseType === tab){
+    counter.style.display = 'none';
+    return;
+  }
+  var remain = DEMO_LIMIT - (demoCount[tab] || 0);
+  document.getElementById('demoRemain').textContent = Math.max(0, remain);
+}
+
+function canExport(tab){
+  if(licenseType === 'bundle') return true;
+  if(licenseType === tab) return true;
+  var used = demoCount[tab] || 0;
+  if(used >= DEMO_LIMIT){
+    alert('デモ版の出力上限（' + DEMO_LIMIT + '回）に達しました。\n製品版をご購入ください。');
+    openModal();
+    return false;
+  }
+  demoCount[tab]++;
+  localStorage.setItem('df_demo', JSON.stringify(demoCount));
+  updateDemoUI();
+  return true;
+}
+
+// ===================================================
+//  タブ切替
+// ===================================================
+function getCurrentTab(){
+  var active = document.querySelector('.tab-btn.active');
+  return active ? active.getAttribute('data-tab') : 'estimate';
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.tab-btn[data-tab="'+tab+'"]').classList.add('active');
+  document.querySelectorAll('.doc-section').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('sec-'+tab).classList.add('active');
+  updateDemoUI();
+}
+
+// ===================================================
+//  品目テーブル操作
+// ===================================================
+function addRow(tbodyId){
+  var tbody = document.getElementById(tbodyId);
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><input type="text" placeholder="品名"></td>'
+    +'<td><input type="number" value="1" min="1" oninput="calcRow(this)"></td>'
+    +'<td><input type="number" value="0" min="0" oninput="calcRow(this)"></td>'
+    +'<td><input type="text" readonly value="¥0"></td>'
+    +'<td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td>';
+  tbody.appendChild(tr);
+}
+
+function delRow(btn){
+  var tr = btn.closest('tr');
+  var tbody = tr.parentElement;
+  if(tbody.rows.length > 1){ tr.remove(); calcAll(tbody); }
+}
+
+function calcRow(input){
+  var tr = input.closest('tr');
+  var inputs = tr.querySelectorAll('input');
+  var qty = parseInt(inputs[1].value) || 0;
+  var price = parseInt(inputs[2].value) || 0;
+  var amount = qty * price;
+  inputs[3].value = '¥' + amount.toLocaleString();
+  calcAll(tr.closest('tbody'));
+}
+
+function calcAll(tbody){
+  var prefix = tbody.id.split('-')[0];
+  var rows = tbody.querySelectorAll('tr');
+  var subtotal = 0;
+  rows.forEach(function(tr){
+    var inputs = tr.querySelectorAll('input');
+    var qty = parseInt(inputs[1].value) || 0;
+    var price = parseInt(inputs[2].value) || 0;
+    subtotal += qty * price;
+  });
+  var tax = Math.floor(subtotal * 0.1);
+  var total = subtotal + tax;
+  document.getElementById(prefix+'-subtotal').textContent = '¥' + subtotal.toLocaleString();
+  document.getElementById(prefix+'-tax').textContent = '¥' + tax.toLocaleString();
+  document.getElementById(prefix+'-total').textContent = '¥' + total.toLocaleString();
+}
+
+// ===================================================
+//  自社情報の自動保存・読込
+// ===================================================
+function saveMyInfo(){
+  var tabs = ['est','dlv','rct'];
+  var ref = null;
+  tabs.forEach(function(p){
+    var el = document.getElementById(p+'-myname');
+    if(el && document.activeElement && document.activeElement.id.startsWith(p)){
+      ref = p;
+    }
+  });
+  if(!ref) return;
+  var info = {
+    name: document.getElementById(ref+'-myname').value,
+    addr: document.getElementById(ref+'-myaddr').value,
+    tel:  document.getElementById(ref+'-mytel').value,
+    email:document.getElementById(ref+'-myemail').value,
+    regnum:document.getElementById(ref+'-myregnum').value
+  };
+  localStorage.setItem('df_myinfo', JSON.stringify(info));
+  // 他のタブにも反映
+  tabs.forEach(function(p){
+    if(p !== ref){
+      document.getElementById(p+'-myname').value = info.name;
+      document.getElementById(p+'-myaddr').value = info.addr;
+      document.getElementById(p+'-mytel').value = info.tel;
+      document.getElementById(p+'-myemail').value = info.email;
+      document.getElementById(p+'-myregnum').value = info.regnum;
+    }
+  });
+}
+
+function loadMyInfoToAll(){
+  var info = JSON.parse(localStorage.getItem('df_myinfo') || 'null');
+  if(!info) return;
+  ['est','dlv','rct'].forEach(function(p){
+    document.getElementById(p+'-myname').value = info.name || '';
+    document.getElementById(p+'-myaddr').value = info.addr || '';
+    document.getElementById(p+'-mytel').value = info.tel || '';
+    document.getElementById(p+'-myemail').value = info.email || '';
+    document.getElementById(p+'-myregnum').value = info.regnum || '';
+  });
+}
+
+// ===================================================
+//  取引先辞書
+// ===================================================
+function getClients(){
+  return JSON.parse(localStorage.getItem('df_clients') || '[]');
+}
+
+function saveClient(tab){
+  var p = PREFIXES[tab];
+  var name = document.getElementById(p+'-clientname').value.trim();
+  if(!name){ alert('取引先名を入力してください'); return; }
+  var client = {
+    name: name,
+    person: document.getElementById(p+'-clientperson').value,
+    addr: document.getElementById(p+'-clientaddr').value
+  };
+  var clients = getClients();
+  var idx = clients.findIndex(function(c){ return c.name === name; });
+  if(idx >= 0){ clients[idx] = client; } else { clients.push(client); }
+  localStorage.setItem('df_clients', JSON.stringify(clients));
+  loadClientsToAll();
+  alert('「' + name + '」を保存しました');
+}
+
+function loadClientsToAll(){
+  var clients = getClients();
+  ['estimate','delivery','receipt'].forEach(function(tab){
+    var sel = document.getElementById('clientSelect-'+tab);
+    var val = sel.value;
+    sel.innerHTML = '<option value="">-- 登録済みの取引先 --</option>';
+    clients.forEach(function(c,i){
+      sel.innerHTML += '<option value="'+i+'">'+c.name+'</option>';
+    });
+    sel.value = val;
+  });
+}
+
+function loadClient(tab){
+  var sel = document.getElementById('clientSelect-'+tab);
+  var idx = sel.value;
+  if(idx === '') return;
+  var c = getClients()[parseInt(idx)];
+  var p = PREFIXES[tab];
+  document.getElementById(p+'-clientname').value = c.name || '';
+  document.getElementById(p+'-clientperson').value = c.person || '';
+  document.getElementById(p+'-clientaddr').value = c.addr || '';
+}
+
+// ===================================================
+//  書類変換（見積書→納品書→領収書）
+// ===================================================
+function convertDoc(fromTab, toTab){
+  var fp = PREFIXES[fromTab];
+  var tp = PREFIXES[toTab];
+
+  // 取引先情報コピー
+  document.getElementById(tp+'-clientname').value = document.getElementById(fp+'-clientname').value;
+  document.getElementById(tp+'-clientperson').value = document.getElementById(fp+'-clientperson').value;
+  document.getElementById(tp+'-clientaddr').value = document.getElementById(fp+'-clientaddr').value;
+
+  // 品目コピー
+  var fromBody = document.getElementById(fp+'-items');
+  var toBody = document.getElementById(tp+'-items');
+  toBody.innerHTML = '';
+  fromBody.querySelectorAll('tr').forEach(function(row){
+    var inputs = row.querySelectorAll('input');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="text" value="'+inputs[0].value+'"></td>'
+      +'<td><input type="number" value="'+inputs[1].value+'" min="1" oninput="calcRow(this)"></td>'
+      +'<td><input type="number" value="'+inputs[2].value+'" min="0" oninput="calcRow(this)"></td>'
+      +'<td><input type="text" readonly value="'+inputs[3].value+'"></td>'
+      +'<td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td>';
+    toBody.appendChild(tr);
+  });
+  calcAll(toBody);
+
+  // 備考コピー
+  document.getElementById(tp+'-note').value = document.getElementById(fp+'-note').value;
+
+  // タブ切替
+  switchTab(toTab);
+  alert(DOC_NAMES[fromTab] + 'の内容を' + DOC_NAMES[toTab] + 'にコピーしました');
+}
+
+// ===================================================
+//  フォームクリア
+// ===================================================
+function clearForm(tab){
+  if(!confirm('入力内容をクリアしますか？')) return;
+  var p = PREFIXES[tab];
+  var section = document.getElementById('sec-'+tab);
+  section.querySelectorAll('input:not([readonly])').forEach(function(el){
+    if(el.id && el.id.startsWith(p+'-my')) return; // 自社情報は残す
+    if(el.type === 'date'){ el.value = new Date().toISOString().split('T')[0]; }
+    else if(el.type === 'number'){ el.value = el.min || '0'; }
+    else { el.value = ''; }
+  });
+  section.querySelectorAll('textarea').forEach(function(el){ el.value = ''; });
+  section.querySelectorAll('input[readonly]').forEach(function(el){ el.value = '¥0'; });
+  // 品目を1行にリセット
+  var tbody = document.getElementById(p+'-items');
+  tbody.innerHTML = '<tr><td><input type="text" placeholder="品名"></td>'
+    +'<td><input type="number" value="1" min="1" oninput="calcRow(this)"></td>'
+    +'<td><input type="number" value="0" min="0" oninput="calcRow(this)"></td>'
+    +'<td><input type="text" readonly value="¥0"></td>'
+    +'<td class="col-del"><button class="btn-del-row" onclick="delRow(this)">×</button></td></tr>';
+  document.getElementById(p+'-subtotal').textContent = '¥0';
+  document.getElementById(p+'-tax').textContent = '¥0';
+  document.getElementById(p+'-total').textContent = '¥0';
+}
+
+// ===================================================
+//  PDF出力（プレビュー兼用）
+// ===================================================
+function previewDoc(tab){
+  generatePrintWindow(tab, false);
+}
+
+function exportPDF(tab){
+  if(!canExport(tab)) return;
+  generatePrintWindow(tab, true);
+  saveToHistory(tab);
+}
+
+function generatePrintWindow(tab, autoPrint){
+  var p = PREFIXES[tab];
+  var docName = DOC_NAMES[tab];
+  var isDemo = !(licenseType === 'bundle' || licenseType === tab);
+
+  // データ収集
+  var docnum = document.getElementById(p+'-docnum').value || '';
+  var date = document.getElementById(p+'-date').value || '';
+  var extra = '';
+  if(tab === 'estimate') extra = '<p>有効期限：' + (document.getElementById('est-expiry').value || '未設定') + '</p>';
+  if(tab === 'delivery') extra = '<p>納品日：' + (document.getElementById('dlv-delivdate').value || '未設定') + '</p>';
+  if(tab === 'receipt') extra = '<p>但し書き：' + (document.getElementById('rct-description').value || '') + '</p>';
+
+  var myname = document.getElementById(p+'-myname').value;
+  var myaddr = document.getElementById(p+'-myaddr').value;
+  var mytel = document.getElementById(p+'-mytel').value;
+  var myemail = document.getElementById(p+'-myemail').value;
+  var myregnum = document.getElementById(p+'-myregnum').value;
+
+  var clientname = document.getElementById(p+'-clientname').value;
+  var clientperson = document.getElementById(p+'-clientperson').value;
+  var clientaddr = document.getElementById(p+'-clientaddr').value;
+
+  // 品目
+  var tbody = document.getElementById(p+'-items');
+  var itemsHtml = '';
+  tbody.querySelectorAll('tr').forEach(function(row){
+    var inputs = row.querySelectorAll('input');
+    itemsHtml += '<tr><td>'+inputs[0].value+'</td><td style="text-align:center">'+inputs[1].value+'</td><td style="text-align:right">¥'+(parseInt(inputs[2].value)||0).toLocaleString()+'</td><td style="text-align:right">'+inputs[3].value+'</td></tr>';
+  });
+
+  var subtotal = document.getElementById(p+'-subtotal').textContent;
+  var tax = document.getElementById(p+'-tax').textContent;
+  var total = document.getElementById(p+'-total').textContent;
+  var note = document.getElementById(p+'-note').value;
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+docName+'</title>'
+    +'<style>'
+    +'body{font-family:"Noto Sans JP",sans-serif;padding:40px;max-width:800px;margin:0 auto;color:#333}'
+    +'h1{font-size:1.6rem;text-align:center;margin-bottom:8px}'
+    +'.doc-num{text-align:center;color:#888;margin-bottom:24px}'
+    +'.row{display:flex;justify-content:space-between;margin-bottom:24px}'
+    +'.col{width:48%}'
+    +'.col h3{font-size:.85rem;color:#888;margin-bottom:8px;border-bottom:1px solid #eee;padding-bottom:4px}'
+    +'.col p{font-size:.85rem;line-height:1.6}'
+    +'table{width:100%;border-collapse:collapse;margin-bottom:16px}'
+    +'th{background:#f5f5f5;padding:10px;font-size:.8rem;text-align:left;border-bottom:2px solid #ddd}'
+    +'td{padding:10px;border-bottom:1px solid #eee;font-size:.85rem}'
+    +'.totals-print{text-align:right;margin-bottom:24px}'
+    +'.totals-print .tr{display:flex;justify-content:flex-end;gap:24px;margin-bottom:4px;font-size:.9rem}'
+    +'.totals-print .tr.total{font-weight:800;font-size:1.2rem;color:#0071e3}'
+    +'.note{background:#f9f9f9;padding:16px;border-radius:8px;font-size:.85rem;line-height:1.6}'
+    +'.watermark-print{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:6rem;color:rgba(255,0,0,.08);font-weight:900;pointer-events:none}'
+    +'</style></head><body>';
+
+  if(isDemo) html += '<div class="watermark-print">DEMO</div>';
+
+  html += '<h1>'+docName+'</h1>'
+    +'<p class="doc-num">No. '+docnum+' ／ 発行日：'+date+'</p>'
+    +extra
+    +'<div class="row">'
+    +'<div class="col"><h3>自社情報</h3><p><strong>'+myname+'</strong><br>'+myaddr+'<br>TEL: '+mytel+'<br>Email: '+myemail+'</p>'
+    +(myregnum ? '<p>登録番号：'+myregnum+'</p>' : '')
+    +'</div>'
+    +'<div class="col"><h3>取引先</h3><p><strong>'+clientname+' 御中</strong>'
+    +(clientperson ? '<br>担当：'+clientperson : '')
+    +'<br>'+clientaddr+'</p></div>'
+    +'</div>'
+    +'<table><thead><tr><th>品名</th><th style="text-align:center">数量</th><th style="text-align:right">単価</th><th style="text-align:right">金額</th></tr></thead><tbody>'
+    +itemsHtml
+    +'</tbody></table>'
+    +'<div class="totals-print">'
+    +'<div class="tr"><span>小計</span><span>'+subtotal+'</span></div>'
+    +'<div class="tr"><span>消費税（10%）</span><span>'+tax+'</span></div>'
+    +'<div class="tr total"><span>合計</span><span>'+total+'</span></div>'
+    +'</div>';
+
+  if(note) html += '<div class="note"><strong>備考：</strong><br>'+note.replace(/\n/g,'<br>')+'</div>';
+
+  html += '</body></html>';
+
+  var win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  if(autoPrint){
+    win.onload = function(){ win.print(); };
+  }
+}
+
+// ===================================================
+//  履歴管理
+// ===================================================
+function getHistory(){
+  return JSON.parse(localStorage.getItem('df_history') || '[]');
+}
+
+function saveToHistory(tab){
+  var p = PREFIXES[tab];
+  var entry = {
+    id: Date.now(),
+    type: tab,
+    typeName: DOC_NAMES[tab],
+    docnum: document.getElementById(p+'-docnum').value,
+    client: document.getElementById(p+'-clientname').value,
+    total: document.getElementById(p+'-total').textContent,
+    date: document.getElementById(p+'-date').value,
+    savedAt: new Date().toLocaleString('ja-JP')
+  };
+  var hist = getHistory();
+  hist.unshift(entry);
+  if(hist.length > 50) hist = hist.slice(0,50);
+  localStorage.setItem('df_history', JSON.stringify(hist));
+  renderHistory();
+}
+
+function renderHistory(){
+  var hist = getHistory();
+  var list = document.getElementById('historyList');
+  var empty = document.getElementById('historyEmpty');
+  if(hist.length === 0){
+    empty.style.display = 'block';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = '';
+  hist.forEach(function(h){
+    var li = document.createElement('li');
+    li.className = 'history-item';
+    li.innerHTML = '<div><strong>'+h.typeName+'</strong> '+h.docnum+' — '+h.client+' <span class="history-meta">'+h.total+' ／ '+h.savedAt+'</span></div>'
+      +'<div class="history-actions"><button onclick="deleteHistory('+h.id+')">削除</button></div>';
+    list.appendChild(li);
+  });
+}
+
+function deleteHistory(id){
+  var hist = getHistory().filter(function(h){ return h.id !== id; });
+  localStorage.setItem('df_history', JSON.stringify(hist));
+  renderHistory();
+}
+
+// 履歴タブを開いたら描画
+var origSwitch = switchTab;
+switchTab = function(tab){
+  origSwitch(tab);
+  if(tab === 'history') renderHistory();
+};
+
+</script>
+</body>
+</html>
