@@ -475,7 +475,7 @@ function activLic(){
     btn.disabled=true;btn.textContent='認証中...';
     fetch('https://api.polar.sh/v1/customer-portal/license-keys/validate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,organization_id:POLAR_ORG_ID})})
     .then(r=>{if(!r.ok)throw new Error('invalid');return r.json()}).then(data=>{
-      if(data.status==='granted'){
+      if(data.validated){
         localStorage.setItem(SK+'_lic',JSON.stringify({valid:true,key:h,mode:'pro'}));
         enterApp('pro');toast('アクティベート完了','ok');
       } else {err.textContent='無効なライセンスキーです'}
