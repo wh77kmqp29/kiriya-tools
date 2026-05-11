@@ -2,7 +2,7 @@
   "name": "ふくやくん - 服薬リマインダー",
   "short_name": "ふくやくん",
   "description": "薬の飲み忘れを防ぐシンプルなリマインダー",
-  "start_url": "./fukuyakun.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#e8f4f8",
   "theme_color": "#4fc3f7",
