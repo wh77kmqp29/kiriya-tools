@@ -78,6 +78,10 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
 .btn-remove{background:none;border:none;color:#ef5350;font-size:18px;cursor:pointer;padding:4px 8px}
 .btn-save{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);border:none;border-radius:var(--radius);padding:16px;width:100%;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px}
 
+/* ===== NOTIFICATION BANNER ===== */
+.notif-banner{background:#fff3e0;color:#e65100;text-align:center;padding:10px 16px;font-size:12px;cursor:pointer;display:none;font-weight:600}
+.notif-banner.show{display:block}
+
 /* ===== NAV ===== */
 .nav{display:flex;justify-content:space-around;padding:10px 0 env(safe-area-inset-bottom,8px);background:var(--white);border-top:1px solid #e8f0f4;margin-top:auto}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-l);cursor:pointer;padding:4px 12px;border-radius:8px;transition:color .2s}
@@ -112,6 +116,11 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
   <div class="header-icon">💊</div>
   <h1>ふくやくん</h1>
   <p>きょうも おくすり わすれずに</p>
+</div>
+
+<!-- NOTIFICATION BANNER -->
+<div class="notif-banner" id="notifBanner" onclick="requestNotificationPermission()">
+  🔔 タップして通知を許可すると、お薬の時間にお知らせが届きます
 </div>
 
 <!-- TAB: HOME -->
@@ -186,12 +195,10 @@ function todayRec(){if(!records[today()])records[today()]={};return records[toda
 
 /* ======== RENDER ======== */
 function render(){
-  // date
   const d=new Date();
   const wd=['日','月','火','水','木','金','土'][d.getDay()];
   document.getElementById('dateBar').textContent=`${d.getMonth()+1}月${d.getDate()}日（${wd}）`;
 
-  // circles
   const wrap=document.getElementById('circles');
   wrap.innerHTML='';
   const rec=todayRec();
@@ -210,7 +217,6 @@ function render(){
     wrap.appendChild(div);
   });
 
-  // buttons
   const allDone=doneCount===config.slots.length;
   document.getElementById('btnTake').disabled=allDone;
   document.getElementById('btnTake').textContent=allDone?'✅ きょうは全部のんだよ！':'💊 のんだよ！';
@@ -218,7 +224,6 @@ function render(){
   const lastTaken=Object.keys(rec).filter(k=>rec[k]).sort().pop();
   document.getElementById('btnUndo').disabled=lastTaken===undefined;
 
-  // praise
   const praise=document.getElementById('praise');
   if(allDone){
     const msgs=['すごい！今日も全部飲めました！🎉','パーフェクト！えらい！✨','完璧です！その調子！💪','全部飲めた！最高！🌟'];
@@ -232,8 +237,8 @@ function render(){
     praise.textContent='';
   }
 
-  // streak
   updateStreak();
+  updateNotifBanner();
 }
 
 /* ======== TAKE MED ======== */
@@ -269,7 +274,6 @@ function undoMed(){
 function updateStreak(){
   let streak=0;
   let d=new Date();
-  // check today first - only count if all done
   const todayKey=d.toISOString().slice(0,10);
   const todayComplete=records[todayKey]&&config.slots.every((_,i)=>records[todayKey][i]);
   if(todayComplete){
@@ -379,27 +383,59 @@ function renderSettingsForm(){
 }
 function addMed(si){config.slots[si].meds.push('');renderSettingsForm()}
 function removeMed(si,mi){config.slots[si].meds.splice(mi,1);renderSettingsForm()}
+
 function saveSettings(){
   saveConfig();
   closeSettings();
-  setupNotifications();
   render();
+  requestNotificationPermission();
 }
 
-/* ======== PWA & NOTIFICATIONS ======== */
+/* ======== NOTIFICATIONS ======== */
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js');
 }
 
-async function setupNotifications(){
-  if(!('Notification' in window))return;
+function updateNotifBanner(){
+  const banner=document.getElementById('notifBanner');
+  if(!('Notification' in window)){
+    banner.classList.remove('show');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    banner.classList.remove('show');
+  }else if(Notification.permission==='denied'){
+    banner.textContent='🔕 通知がブロックされています。ブラウザの設定から許可してください。';
+    banner.classList.add('show');
+  }else{
+    banner.classList.add('show');
+  }
+}
+
+async function requestNotificationPermission(){
+  if(!('Notification' in window)){
+    alert('このブラウザは通知に対応していません');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    scheduleLocalAlarms();
+    updateNotifBanner();
+    return;
+  }
+  if(Notification.permission==='denied'){
+    alert('通知がブロックされています。\nブラウザの設定から通知を許可してください。');
+    return;
+  }
   const perm=await Notification.requestPermission();
-  if(perm!=='granted')return;
-  scheduleLocalAlarms();
+  if(perm==='granted'){
+    scheduleLocalAlarms();
+  }else{
+    alert('通知を許可すると、お薬の時間にお知らせが届きます。');
+  }
+  updateNotifBanner();
 }
 
 function scheduleLocalAlarms(){
-  // Clear existing
   if(window._alarmTimers)window._alarmTimers.forEach(t=>clearTimeout(t));
   window._alarmTimers=[];
 
@@ -408,15 +444,13 @@ function scheduleLocalAlarms(){
     const [h,m]=slot.time.split(':').map(Number);
     const target=new Date();
     target.setHours(h,m,0,0);
-    if(target<=now)return; // already passed today
+    if(target<=now)return;
 
     const delay=target-now;
     const timer=setTimeout(()=>{
       const rec=todayRec();
       if(!rec[i]){
-        // Vibrate
         if(navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
-        // Sound
         try{
           const ctx=new(window.AudioContext||window.webkitAudioContext)();
           const osc=ctx.createOscillator();
@@ -427,7 +461,6 @@ function scheduleLocalAlarms(){
           osc.start();
           setTimeout(()=>{osc.stop();ctx.close()},1000);
         }catch(e){}
-        // Notification
         if(Notification.permission==='granted'){
           new Notification('ふくやくん 💊',{
             body:`${slot.label}のおくすりの時間です！`,
@@ -448,15 +481,16 @@ setInterval(()=>{
   if(today()!==_currentDay){
     _currentDay=today();
     render();
-    scheduleLocalAlarms();
+    if(Notification.permission==='granted')scheduleLocalAlarms();
   }
 },60000);
 
 /* ======== INIT ======== */
 render();
-setupNotifications();
+if(Notification.permission==='granted'){
+  scheduleLocalAlarms();
+}
 
-// First visit: open settings
 if(!localStorage.getItem(SK+'_config')){
   setTimeout(()=>openSettings(),800);
 }
