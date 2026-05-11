@@ -10,49 +10,99 @@
 :root{
   --primary:#4fc3f7;--primary-d:#0397d6;--primary-l:#e8f4f8;
   --accent:#ff8a65;--success:#66bb6a;--bg:#f0f9ff;
-  --text:#334155;--text-l:#94a3b8;--white:#fff;--shadow:0 2px 16px rgba(79,195,247,.15);
+  --text:#334155;--text-l:#94a3b8;--white:#fff;
+  --shadow:0 2px 16px rgba(79,195,247,.12);
   --radius:16px;
+  --pink:#f06292;--yellow:#ffca28;--purple:#ab47bc;
 }
 html,body{height:100%;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
-body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height:100dvh;position:relative;overflow-x:hidden}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height:100dvh;overflow-x:hidden}
 
-.header{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);padding:20px 20px 16px;text-align:center;position:relative}
-.header h1{font-size:22px;font-weight:700;letter-spacing:1px}
-.header p{font-size:12px;opacity:.85;margin-top:2px}
-.header-icon{font-size:28px;margin-bottom:4px}
-.btn-settings{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--white);font-size:22px;cursor:pointer;padding:8px}
+/* HEADER */
+.header{background:linear-gradient(135deg,#4fc3f7,#0397d6,#ab47bc);color:var(--white);padding:24px 20px 20px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,.06);border-radius:50%}
+.header h1{font-size:24px;font-weight:800;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.header-sub{font-size:12px;opacity:.85;margin-top:4px;letter-spacing:1px}
+.header-mascot{font-size:40px;margin-bottom:4px;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.btn-settings{position:absolute;right:16px;top:20px;background:rgba(255,255,255,.2);border:none;color:var(--white);font-size:18px;cursor:pointer;padding:8px 10px;border-radius:12px;backdrop-filter:blur(4px)}
 
-.date-bar{text-align:center;padding:14px;font-size:14px;color:var(--text-l);font-weight:500}
+/* DATE */
+.date-bar{text-align:center;padding:14px;font-size:14px;color:var(--text-l);font-weight:600}
 
-.circles-wrap{display:flex;justify-content:center;gap:16px;padding:0 20px;flex-wrap:wrap}
-.circle-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;-webkit-user-select:none;user-select:none}
-.circle-ring{width:90px;height:90px;border-radius:50%;border:5px solid #d0e8f0;display:flex;align-items:center;justify-content:center;font-size:32px;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;background:var(--white)}
-.circle-ring.done{border-color:var(--success);background:linear-gradient(135deg,#e8f5e9,#c8e6c9);transform:scale(1.05)}
-.circle-ring.done::after{content:'✓';position:absolute;top:-4px;right:-4px;background:var(--success);color:var(--white);width:24px;height:24px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700}
-.circle-label{font-size:13px;font-weight:600;color:var(--text)}
+/* PROGRESS RING */
+.progress-section{display:flex;justify-content:center;padding:8px 20px 0}
+.progress-ring-wrap{position:relative;width:140px;height:140px}
+.progress-ring-wrap svg{transform:rotate(-90deg)}
+.progress-ring-bg{fill:none;stroke:#e0f0f8;stroke-width:10}
+.progress-ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.progress-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.progress-pct{font-size:32px;font-weight:800;color:var(--primary-d)}
+.progress-label{font-size:11px;color:var(--text-l);margin-top:-2px}
+
+/* CIRCLES */
+.circles-wrap{display:flex;justify-content:center;gap:14px;padding:16px 20px 0;flex-wrap:wrap}
+.circle-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .2s}
+.circle-item:active{transform:scale(.95)}
+.circle-ring{width:80px;height:80px;border-radius:50%;border:4px solid #d0e8f0;display:flex;align-items:center;justify-content:center;font-size:28px;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;background:var(--white);box-shadow:0 2px 12px rgba(79,195,247,.1)}
+.circle-ring.done{border-color:var(--success);background:linear-gradient(135deg,#e8f5e9,#c8e6c9);transform:scale(1.08);box-shadow:0 4px 20px rgba(102,187,106,.25)}
+.circle-ring.done::after{content:'✓';position:absolute;top:-6px;right:-6px;background:var(--success);color:var(--white);width:22px;height:22px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 2px 6px rgba(102,187,106,.4)}
+.circle-meds{font-size:10px;color:var(--text-l);max-width:80px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.circle-label{font-size:13px;font-weight:700;color:var(--text)}
 .circle-time{font-size:11px;color:var(--text-l)}
 
-.praise{text-align:center;padding:20px;font-size:18px;font-weight:700;color:var(--success);opacity:0;transform:translateY(10px);transition:all .5s;min-height:60px;display:flex;align-items:center;justify-content:center}
+/* PRAISE */
+.praise{text-align:center;padding:12px 20px;font-size:16px;font-weight:700;color:var(--success);opacity:0;transform:translateY(10px);transition:all .5s;min-height:48px;display:flex;align-items:center;justify-content:center}
 .praise.show{opacity:1;transform:translateY(0)}
 
+/* ACTION */
 .action-area{padding:0 20px 12px;display:flex;flex-direction:column;gap:10px}
 .btn{padding:16px;border:none;border-radius:var(--radius);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;letter-spacing:.5px}
-.btn-take{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);box-shadow:0 4px 16px rgba(79,195,247,.35)}
+.btn-take{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);box-shadow:0 4px 20px rgba(79,195,247,.35);position:relative;overflow:hidden}
+.btn-take::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.3);border-radius:50%;transform:translate(-50%,-50%);transition:width .4s,height .4s}
+.btn-take:active::after{width:300px;height:300px}
 .btn-take:active{transform:scale(.97)}
 .btn-take:disabled{opacity:.5;cursor:default;transform:none}
+.btn-take:disabled::after{display:none}
 .btn-undo{background:var(--white);color:var(--text-l);border:1.5px solid #e2e8f0;font-size:13px;padding:12px}
 .btn-undo:disabled{opacity:.3;cursor:default}
 
-.section-title{font-size:15px;font-weight:700;padding:20px 20px 10px;display:flex;align-items:center;gap:6px}
+/* STREAK & BADGE */
+.stats-row{display:flex;gap:10px;padding:0 20px;margin-bottom:8px}
+.stat-card{flex:1;background:var(--white);border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
+.stat-num{font-size:26px;font-weight:800;color:var(--primary-d)}
+.stat-label{font-size:10px;color:var(--text-l);margin-top:2px}
+.badge-card{flex:1;background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:14px;padding:14px;box-shadow:var(--shadow);text-align:center}
+.badge-icon{font-size:28px}
+.badge-name{font-size:11px;font-weight:700;color:var(--accent);margin-top:2px}
+
+/* CALENDAR */
+.section-title{font-size:15px;font-weight:700;padding:16px 20px 8px;display:flex;align-items:center;gap:6px}
+.calendar-wrap{padding:0 20px 8px}
+.calendar-month{font-size:13px;font-weight:700;text-align:center;margin-bottom:8px;color:var(--text)}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calendar-day-label{font-size:9px;text-align:center;color:var(--text-l);font-weight:600;padding:2px 0}
+.calendar-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;position:relative}
+.calendar-cell.empty{background:transparent}
+.calendar-cell.future{background:#f8fbff;color:var(--text-l)}
+.calendar-cell.perfect{background:linear-gradient(135deg,#c8e6c9,#a5d6a7);color:#2e7d32}
+.calendar-cell.partial{background:linear-gradient(135deg,#fff9c4,#fff176);color:#f57f17}
+.calendar-cell.missed{background:#ffeef0;color:#ef5350}
+.calendar-cell.today{box-shadow:0 0 0 2px var(--primary);font-weight:800}
+
+/* HISTORY LIST */
 .history-list{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
 .history-item{background:var(--white);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
 .history-date{font-size:14px;font-weight:600}
+.history-time{font-size:11px;color:var(--text-l)}
 .history-badges{display:flex;gap:6px}
 .history-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
 .history-badge.done{background:#e8f5e9;color:var(--success)}
 .history-badge.missed{background:#ffeef0;color:#ef5350}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:90dvh;overflow-y:auto;padding:24px 20px 40px;animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -68,21 +118,28 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
 .btn-remove{background:none;border:none;color:#ef5350;font-size:18px;cursor:pointer;padding:4px 8px}
 .btn-save{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);border:none;border-radius:var(--radius);padding:16px;width:100%;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px}
 
+/* NAV */
 .nav{display:flex;justify-content:space-around;padding:10px 0 env(safe-area-inset-bottom,8px);background:var(--white);border-top:1px solid #e8f0f4;margin-top:auto}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-l);cursor:pointer;padding:4px 12px;border-radius:8px;transition:color .2s}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-l);cursor:pointer;padding:4px 16px;border-radius:8px;transition:all .2s}
 .nav-item.active{color:var(--primary-d)}
 .nav-item span{font-size:20px}
 
+/* TABS */
 .tab-content{display:none;flex:1;overflow-y:auto;padding-bottom:8px}
 .tab-content.active{display:flex;flex-direction:column}
 
+/* CONFETTI */
 .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
-.confetti{position:absolute;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-in forwards}
-@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+.confetti{position:absolute;border-radius:2px;animation:confettiFall 1.8s ease-in forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0) scale(1)}100%{opacity:0;transform:translateY(100vh) rotate(1080deg) scale(.5)}}
 
-.streak-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--white);margin:0 20px;border-radius:12px;box-shadow:var(--shadow)}
-.streak-num{font-size:28px;font-weight:800;color:var(--primary-d)}
-.streak-label{font-size:12px;color:var(--text-l)}
+/* SPARKLE on tap */
+.sparkle{position:fixed;pointer-events:none;z-index:150;font-size:24px;animation:sparkleAnim .6s ease-out forwards}
+@keyframes sparkleAnim{0%{opacity:1;transform:scale(0) translateY(0)}50%{opacity:1;transform:scale(1.2) translateY(-20px)}100%{opacity:0;transform:scale(.8) translateY(-40px)}}
+
+/* FOOTER */
+.footer{text-align:center;padding:8px;font-size:10px;color:var(--text-l)}
+.footer a{color:var(--primary-d);text-decoration:none}
 
 @media(min-width:431px){
   body::before{content:'📱 スマホでの利用を推奨しています';display:block;text-align:center;padding:8px;background:#fff3e0;color:#e65100;font-size:12px}
@@ -93,22 +150,45 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
 
 <div class="header">
   <button class="btn-settings" onclick="openSettings()">⚙️</button>
-  <div class="header-icon">💊</div>
+  <div class="header-mascot">💊</div>
   <h1>ふくやくん</h1>
-  <p>きょうも おくすり わすれずに</p>
+  <div class="header-sub">きょうも おくすり わすれずに</div>
 </div>
 
 <div class="tab-content active" id="tabHome">
   <div class="date-bar" id="dateBar"></div>
 
-  <div class="streak-bar">
-    <div><span class="streak-num" id="streakNum">0</span></div>
-    <div><span class="streak-label">日連続<br>達成中 🔥</span></div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="streakNum">0</div>
+      <div class="stat-label">🔥 連続達成</div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon" id="badgeIcon">🥚</div>
+      <div class="badge-name" id="badgeName">はじめたばかり</div>
+    </div>
   </div>
 
-  <div style="padding-top:16px">
-    <div class="circles-wrap" id="circles"></div>
+  <div class="progress-section">
+    <div class="progress-ring-wrap">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4fc3f7"/>
+            <stop offset="100%" stop-color="#66bb6a"/>
+          </linearGradient>
+        </defs>
+        <circle class="progress-ring-bg" cx="70" cy="70" r="60"/>
+        <circle class="progress-ring-fill" id="ringFill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"/>
+      </svg>
+      <div class="progress-center">
+        <div class="progress-pct" id="progressPct">0%</div>
+        <div class="progress-label">きょうの服薬率</div>
+      </div>
+    </div>
   </div>
+
+  <div class="circles-wrap" id="circles"></div>
 
   <div class="praise" id="praise"></div>
 
@@ -119,7 +199,9 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
 </div>
 
 <div class="tab-content" id="tabHistory">
-  <div class="section-title">📅 ふくやく履歴</div>
+  <div class="section-title">📅 カレンダー</div>
+  <div class="calendar-wrap" id="calendarWrap"></div>
+  <div class="section-title">📋 くわしい履歴</div>
   <div class="history-list" id="historyList"></div>
 </div>
 
@@ -127,6 +209,8 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height
   <div class="nav-item active" onclick="switchTab('Home')"><span>🏠</span>きょう</div>
   <div class="nav-item" onclick="switchTab('History')"><span>📅</span>りれき</div>
 </div>
+
+<div class="footer">Powered by <a href="https://wh77kmqp29.github.io/kiriya-tools/" target="_blank">Kiriya Tools</a></div>
 
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
@@ -156,6 +240,24 @@ function saveRecords(){localStorage.setItem(SK+'_records',JSON.stringify(records
 function today(){return new Date().toISOString().slice(0,10)}
 function todayRec(){if(!records[today()])records[today()]={};return records[today()]}
 
+/* ======== BADGES ======== */
+const BADGES=[
+  {min:0,icon:'🥚',name:'はじめたばかり'},
+  {min:3,icon:'🐣',name:'3日達成！ビギナー'},
+  {min:7,icon:'⭐',name:'1週間！がんばり屋さん'},
+  {min:14,icon:'🌟',name:'2週間！すごい！'},
+  {min:30,icon:'🏆',name:'1ヶ月！ふくやくマスター'},
+  {min:60,icon:'💎',name:'2ヶ月！レジェンド'},
+  {min:100,icon:'👑',name:'100日！神'}
+];
+
+function getBadge(streak){
+  let badge=BADGES[0];
+  for(const b of BADGES){if(streak>=b.min)badge=b}
+  return badge;
+}
+
+/* ======== RENDER ======== */
 function render(){
   const d=new Date();
   const wd=['日','月','火','水','木','金','土'][d.getDay()];
@@ -174,39 +276,60 @@ function render(){
       <div class="circle-ring${done?' done':''}">${done?'😊':'💊'}</div>
       <div class="circle-label">${s.label}</div>
       <div class="circle-time">${s.time}</div>
+      <div class="circle-meds">${s.meds.join(', ')}</div>
     `;
     div.onclick=()=>{if(!done)takeSpecific(i)};
     wrap.appendChild(div);
   });
 
-  const allDone=doneCount===config.slots.length;
+  // Progress ring
+  const total=config.slots.length;
+  const pct=total>0?Math.round(doneCount/total*100):0;
+  const circumference=2*Math.PI*60; // r=60
+  const offset=circumference-(pct/100)*circumference;
+  document.getElementById('ringFill').style.strokeDashoffset=offset;
+  document.getElementById('progressPct').textContent=pct+'%';
+
+  // Buttons
+  const allDone=doneCount===total;
   document.getElementById('btnTake').disabled=allDone;
   document.getElementById('btnTake').textContent=allDone?'✅ きょうは全部のんだよ！':'💊 のんだよ！';
-
   const lastTaken=Object.keys(rec).filter(k=>rec[k]).sort().pop();
   document.getElementById('btnUndo').disabled=lastTaken===undefined;
 
+  // Praise
   const praise=document.getElementById('praise');
   if(allDone){
-    const msgs=['すごい！今日も全部飲めました！🎉','パーフェクト！えらい！✨','完璧です！その調子！💪','全部飲めた！最高！🌟'];
+    const msgs=['すごい！今日も全部飲めました！🎉','パーフェクト！えらい！✨','完璧です！その調子！💪','全部飲めた！最高！🌟','100点満点！💯'];
     praise.textContent=msgs[Math.floor(Math.random()*msgs.length)];
     praise.classList.add('show');
   }else if(doneCount>0){
-    praise.textContent=`あと${config.slots.length-doneCount}回！がんばれ！💪`;
+    praise.textContent=`あと${total-doneCount}回！がんばれ！💪`;
     praise.classList.add('show');
   }else{
     praise.classList.remove('show');
     praise.textContent='';
   }
-  updateStreak();
+
+  // Streak & Badge
+  const streak=calcStreak();
+  document.getElementById('streakNum').textContent=streak;
+  const badge=getBadge(streak);
+  document.getElementById('badgeIcon').textContent=badge.icon;
+  document.getElementById('badgeName').textContent=badge.name;
 }
 
+/* ======== TAKE MED ======== */
 function takeSpecific(idx){
   const rec=todayRec();
   if(rec[idx])return;
   rec[idx]=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
   saveRecords();
   render();
+
+  // Sparkle effect
+  spawnSparkle();
+
   if(config.slots.every((_,i)=>rec[i]))launchConfetti();
 }
 
@@ -221,7 +344,23 @@ function undoMed(){
   if(keys.length>0){delete rec[keys[0]];saveRecords();render()}
 }
 
-function updateStreak(){
+/* ======== SPARKLE ======== */
+function spawnSparkle(){
+  const emojis=['✨','⭐','💊','😊','🎉'];
+  for(let i=0;i<3;i++){
+    const el=document.createElement('div');
+    el.className='sparkle';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left=(30+Math.random()*40)+'%';
+    el.style.top=(40+Math.random()*20)+'%';
+    el.style.animationDelay=(i*0.1)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),700);
+  }
+}
+
+/* ======== STREAK ======== */
+function calcStreak(){
   let streak=0;let d=new Date();
   const todayKey=d.toISOString().slice(0,10);
   const todayComplete=records[todayKey]&&config.slots.every((_,i)=>records[todayKey][i]);
@@ -230,24 +369,86 @@ function updateStreak(){
     const key=d.toISOString().slice(0,10);
     if(records[key]&&config.slots.every((_,i)=>records[key][i])){streak++;d.setDate(d.getDate()-1)}else break;
   }
-  document.getElementById('streakNum').textContent=streak;
+  return streak;
 }
 
+/* ======== CONFETTI ======== */
 function launchConfetti(){
   const c=document.createElement('div');c.className='confetti-container';
-  const colors=['#4fc3f7','#ff8a65','#66bb6a','#ffee58','#ab47bc','#ef5350'];
-  for(let i=0;i<40;i++){
+  const colors=['#4fc3f7','#ff8a65','#66bb6a','#ffee58','#ab47bc','#ef5350','#f06292'];
+  for(let i=0;i<50;i++){
     const p=document.createElement('div');p.className='confetti';
     p.style.left=Math.random()*100+'%';p.style.top=-10+'px';
     p.style.background=colors[Math.floor(Math.random()*colors.length)];
-    p.style.animationDelay=Math.random()*0.5+'s';
-    p.style.width=(6+Math.random()*8)+'px';p.style.height=(6+Math.random()*8)+'px';
+    p.style.animationDelay=Math.random()*0.6+'s';
+    p.style.width=(6+Math.random()*10)+'px';p.style.height=(6+Math.random()*10)+'px';
     c.appendChild(p);
   }
-  document.body.appendChild(c);setTimeout(()=>c.remove(),2500);
+  document.body.appendChild(c);setTimeout(()=>c.remove(),3000);
 }
 
+/* ======== CALENDAR ======== */
+function renderCalendar(){
+  const wrap=document.getElementById('calendarWrap');
+  wrap.innerHTML='';
+  const now=new Date();
+  const year=now.getFullYear();
+  const month=now.getMonth();
+  const todayStr=today();
+
+  const monthLabel=document.createElement('div');
+  monthLabel.className='calendar-month';
+  monthLabel.textContent=`${year}年${month+1}月`;
+  wrap.appendChild(monthLabel);
+
+  const grid=document.createElement('div');
+  grid.className='calendar-grid';
+
+  ['日','月','火','水','木','金','土'].forEach(d=>{
+    const lbl=document.createElement('div');
+    lbl.className='calendar-day-label';
+    lbl.textContent=d;
+    grid.appendChild(lbl);
+  });
+
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+
+  for(let i=0;i<firstDay;i++){
+    const empty=document.createElement('div');
+    empty.className='calendar-cell empty';
+    grid.appendChild(empty);
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cell=document.createElement('div');
+    cell.className='calendar-cell';
+    cell.textContent=d;
+
+    if(dateStr===todayStr)cell.classList.add('today');
+
+    if(dateStr>todayStr){
+      cell.classList.add('future');
+    }else if(records[dateStr]){
+      const rec=records[dateStr];
+      const allDone=config.slots.every((_,i)=>rec[i]);
+      const someDone=config.slots.some((_,i)=>rec[i]);
+      if(allDone)cell.classList.add('perfect');
+      else if(someDone)cell.classList.add('partial');
+      else cell.classList.add('missed');
+    }else if(dateStr<todayStr){
+      cell.classList.add('missed');
+    }
+
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid);
+}
+
+/* ======== HISTORY ======== */
 function renderHistory(){
+  renderCalendar();
   const list=document.getElementById('historyList');list.innerHTML='';
   const keys=Object.keys(records).sort().reverse().slice(0,30);
   if(keys.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-l)">まだ記録がありません</div>';return}
@@ -260,11 +461,13 @@ function renderHistory(){
       const done=!!rec[i];
       badges+=`<div class="history-badge ${done?'done':'missed'}">${done?'✓':'✗'}</div>`;
     });
-    div.innerHTML=`<div class="history-date">${k.slice(5).replace('-','/')}（${wd}）</div><div class="history-badges">${badges}</div>`;
+    const times=config.slots.map((s,i)=>rec[i]?rec[i]:'--:--').join(' / ');
+    div.innerHTML=`<div><div class="history-date">${k.slice(5).replace('-','/')}（${wd}）</div><div class="history-time">${times}</div></div><div class="history-badges">${badges}</div>`;
     list.appendChild(div);
   });
 }
 
+/* ======== TABS ======== */
 function switchTab(name){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab'+name).classList.add('active');
@@ -272,6 +475,7 @@ function switchTab(name){
   if(name==='History')renderHistory();
 }
 
+/* ======== SETTINGS ======== */
 function openSettings(){renderSettingsForm();document.getElementById('settingsModal').classList.add('open')}
 function closeSettings(){document.getElementById('settingsModal').classList.remove('open')}
 function renderSettingsForm(){
@@ -288,9 +492,11 @@ function addMed(si){config.slots[si].meds.push('');renderSettingsForm()}
 function removeMed(si,mi){config.slots[si].meds.splice(mi,1);renderSettingsForm()}
 function saveSettings(){saveConfig();closeSettings();render()}
 
+/* ======== DAILY RESET ======== */
 let _currentDay=today();
 setInterval(()=>{if(today()!==_currentDay){_currentDay=today();render()}},60000);
 
+/* ======== INIT ======== */
 render();
 if(!localStorage.getItem(SK+'_config'))setTimeout(()=>openSettings(),800);
 </script>
