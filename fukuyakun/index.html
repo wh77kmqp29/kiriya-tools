@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#4fc3f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>ふくやくん</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#4fc3f7;--primary-d:#0397d6;--primary-l:#e8f4f8;
+  --accent:#ff8a65;--success:#66bb6a;--bg:#f0f9ff;
+  --text:#334155;--text-l:#94a3b8;--white:#fff;--shadow:0 2px 16px rgba(79,195,247,.15);
+  --radius:16px;
+}
+html,body{height:100%;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;min-height:100dvh;position:relative;overflow-x:hidden}
+
+/* ===== HEADER ===== */
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);padding:20px 20px 16px;text-align:center;position:relative}
+.header h1{font-size:22px;font-weight:700;letter-spacing:1px}
+.header p{font-size:12px;opacity:.85;margin-top:2px}
+.header-icon{font-size:28px;margin-bottom:4px}
+.btn-settings{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--white);font-size:22px;cursor:pointer;padding:8px}
+
+/* ===== DATE BAR ===== */
+.date-bar{text-align:center;padding:14px;font-size:14px;color:var(--text-l);font-weight:500}
+
+/* ===== CIRCLES ===== */
+.circles-wrap{display:flex;justify-content:center;gap:16px;padding:0 20px;flex-wrap:wrap}
+.circle-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.circle-ring{width:90px;height:90px;border-radius:50%;border:5px solid #d0e8f0;display:flex;align-items:center;justify-content:center;font-size:32px;transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;background:var(--white)}
+.circle-ring.done{border-color:var(--success);background:linear-gradient(135deg,#e8f5e9,#c8e6c9);transform:scale(1.05)}
+.circle-ring.done::after{content:'✓';position:absolute;top:-4px;right:-4px;background:var(--success);color:var(--white);width:24px;height:24px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.circle-label{font-size:13px;font-weight:600;color:var(--text)}
+.circle-time{font-size:11px;color:var(--text-l)}
+
+/* ===== PRAISE ===== */
+.praise{text-align:center;padding:20px;font-size:18px;font-weight:700;color:var(--success);opacity:0;transform:translateY(10px);transition:all .5s;min-height:60px;display:flex;align-items:center;justify-content:center}
+.praise.show{opacity:1;transform:translateY(0)}
+
+/* ===== ACTION BTN ===== */
+.action-area{padding:0 20px 12px;display:flex;flex-direction:column;gap:10px}
+.btn{padding:16px;border:none;border-radius:var(--radius);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;letter-spacing:.5px}
+.btn-take{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);box-shadow:0 4px 16px rgba(79,195,247,.35)}
+.btn-take:active{transform:scale(.97)}
+.btn-take:disabled{opacity:.5;cursor:default;transform:none}
+.btn-undo{background:var(--white);color:var(--text-l);border:1.5px solid #e2e8f0;font-size:13px;padding:12px}
+.btn-undo:disabled{opacity:.3;cursor:default}
+
+/* ===== HISTORY ===== */
+.section-title{font-size:15px;font-weight:700;padding:20px 20px 10px;display:flex;align-items:center;gap:6px}
+.history-list{padding:0 20px 20px;display:flex;flex-direction:column;gap:8px}
+.history-item{background:var(--white);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center}
+.history-date{font-size:14px;font-weight:600}
+.history-badges{display:flex;gap:6px}
+.history-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.history-badge.done{background:#e8f5e9;color:var(--success)}
+.history-badge.missed{background:#ffeef0;color:#ef5350}
+
+/* ===== SETUP MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:90dvh;overflow-y:auto;padding:24px 20px 40px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.modal p.sub{font-size:13px;color:var(--text-l);margin-bottom:20px}
+.med-group{background:var(--primary-l);border-radius:12px;padding:16px;margin-bottom:12px}
+.med-group-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.med-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.med-row input[type=text]{flex:1;padding:10px 12px;border:1.5px solid #d0e8f0;border-radius:10px;font-size:14px;outline:none;background:var(--white)}
+.med-row input[type=text]:focus{border-color:var(--primary)}
+.med-row input[type=time]{padding:10px;border:1.5px solid #d0e8f0;border-radius:10px;font-size:14px;outline:none;background:var(--white);width:110px}
+.btn-add-med{background:none;border:1.5px dashed #b0d4e3;border-radius:10px;padding:10px;width:100%;font-size:13px;color:var(--primary-d);cursor:pointer;margin-top:4px}
+.btn-remove{background:none;border:none;color:#ef5350;font-size:18px;cursor:pointer;padding:4px 8px}
+.btn-save{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--white);border:none;border-radius:var(--radius);padding:16px;width:100%;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px}
+
+/* ===== NAV ===== */
+.nav{display:flex;justify-content:space-around;padding:10px 0 env(safe-area-inset-bottom,8px);background:var(--white);border-top:1px solid #e8f0f4;margin-top:auto}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-l);cursor:pointer;padding:4px 12px;border-radius:8px;transition:color .2s}
+.nav-item.active{color:var(--primary-d)}
+.nav-item span{font-size:20px}
+
+/* ===== TABS ===== */
+.tab-content{display:none;flex:1;overflow-y:auto;padding-bottom:8px}
+.tab-content.active{display:flex;flex-direction:column}
+
+/* ===== CONFETTI ===== */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
+.confetti{position:absolute;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-in forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+
+/* ===== STREAK ===== */
+.streak-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--white);margin:0 20px;border-radius:12px;box-shadow:var(--shadow)}
+.streak-num{font-size:28px;font-weight:800;color:var(--primary-d)}
+.streak-label{font-size:12px;color:var(--text-l)}
+
+/* ===== PC NOTICE ===== */
+@media(min-width:431px){
+  body::before{content:'📱 スマホでの利用を推奨しています';display:block;text-align:center;padding:8px;background:#fff3e0;color:#e65100;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <button class="btn-settings" onclick="openSettings()">⚙️</button>
+  <div class="header-icon">💊</div>
+  <h1>ふくやくん</h1>
+  <p>きょうも おくすり わすれずに</p>
+</div>
+
+<!-- TAB: HOME -->
+<div class="tab-content active" id="tabHome">
+  <div class="date-bar" id="dateBar"></div>
+
+  <div class="streak-bar">
+    <div><span class="streak-num" id="streakNum">0</span></div>
+    <div><span class="streak-label">日連続<br>達成中 🔥</span></div>
+  </div>
+
+  <div style="padding-top:16px">
+    <div class="circles-wrap" id="circles"></div>
+  </div>
+
+  <div class="praise" id="praise"></div>
+
+  <div class="action-area">
+    <button class="btn btn-take" id="btnTake" onclick="takeMed()">💊 のんだよ！</button>
+    <button class="btn btn-undo" id="btnUndo" onclick="undoMed()" disabled>↩ いまの取り消し</button>
+  </div>
+</div>
+
+<!-- TAB: HISTORY -->
+<div class="tab-content" id="tabHistory">
+  <div class="section-title">📅 ふくやく履歴</div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-item active" onclick="switchTab('Home')"><span>🏠</span>きょう</div>
+  <div class="nav-item" onclick="switchTab('History')"><span>📅</span>りれき</div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ おくすり設定</h2>
+    <p class="sub">飲む時間とお薬の名前を登録してください</p>
+
+    <div id="medGroups"></div>
+
+    <button class="btn-save" onclick="saveSettings()">💾 保存する</button>
+    <button class="btn btn-undo" style="margin-top:8px" onclick="closeSettings()">キャンセル</button>
+  </div>
+</div>
+
+<script>
+/* ======== STATE ======== */
+const SK = 'fukuyakun';
+let config = loadConfig();
+let records = JSON.parse(localStorage.getItem(SK+'_records') || '{}');
+
+function defaultConfig(){
+  return {
+    slots:[
+      {label:'あさ',time:'08:00',meds:['おくすりA']},
+      {label:'ひる',time:'12:00',meds:['おくすりB']},
+      {label:'よる',time:'20:00',meds:['おくすりC']}
+    ]
+  };
+}
+function loadConfig(){
+  const d=localStorage.getItem(SK+'_config');
+  return d?JSON.parse(d):defaultConfig();
+}
+function saveConfig(){localStorage.setItem(SK+'_config',JSON.stringify(config))}
+function saveRecords(){localStorage.setItem(SK+'_records',JSON.stringify(records))}
+function today(){return new Date().toISOString().slice(0,10)}
+function todayRec(){if(!records[today()])records[today()]={};return records[today()]}
+
+/* ======== RENDER ======== */
+function render(){
+  // date
+  const d=new Date();
+  const wd=['日','月','火','水','木','金','土'][d.getDay()];
+  document.getElementById('dateBar').textContent=`${d.getMonth()+1}月${d.getDate()}日（${wd}）`;
+
+  // circles
+  const wrap=document.getElementById('circles');
+  wrap.innerHTML='';
+  const rec=todayRec();
+  let doneCount=0;
+  config.slots.forEach((s,i)=>{
+    const done=!!rec[i];
+    if(done)doneCount++;
+    const div=document.createElement('div');
+    div.className='circle-item';
+    div.innerHTML=`
+      <div class="circle-ring${done?' done':''}" id="ring${i}">${done?'😊':'💊'}</div>
+      <div class="circle-label">${s.label}</div>
+      <div class="circle-time">${s.time}</div>
+    `;
+    div.onclick=()=>{if(!done){takeSpecific(i)}};
+    wrap.appendChild(div);
+  });
+
+  // buttons
+  const allDone=doneCount===config.slots.length;
+  document.getElementById('btnTake').disabled=allDone;
+  document.getElementById('btnTake').textContent=allDone?'✅ きょうは全部のんだよ！':'💊 のんだよ！';
+
+  const lastTaken=Object.keys(rec).filter(k=>rec[k]).sort().pop();
+  document.getElementById('btnUndo').disabled=lastTaken===undefined;
+
+  // praise
+  const praise=document.getElementById('praise');
+  if(allDone){
+    const msgs=['すごい！今日も全部飲めました！🎉','パーフェクト！えらい！✨','完璧です！その調子！💪','全部飲めた！最高！🌟'];
+    praise.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    praise.classList.add('show');
+  }else if(doneCount>0){
+    praise.textContent=`あと${config.slots.length-doneCount}回！がんばれ！💪`;
+    praise.classList.add('show');
+  }else{
+    praise.classList.remove('show');
+    praise.textContent='';
+  }
+
+  // streak
+  updateStreak();
+}
+
+/* ======== TAKE MED ======== */
+function takeSpecific(idx){
+  const rec=todayRec();
+  if(rec[idx])return;
+  rec[idx]=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  saveRecords();
+  render();
+
+  const allDone=config.slots.every((_,i)=>rec[i]);
+  if(allDone)launchConfetti();
+}
+
+function takeMed(){
+  const rec=todayRec();
+  for(let i=0;i<config.slots.length;i++){
+    if(!rec[i]){takeSpecific(i);return}
+  }
+}
+
+function undoMed(){
+  const rec=todayRec();
+  const keys=Object.keys(rec).filter(k=>rec[k]).sort((a,b)=>b-a);
+  if(keys.length>0){
+    delete rec[keys[0]];
+    saveRecords();
+    render();
+  }
+}
+
+/* ======== STREAK ======== */
+function updateStreak(){
+  let streak=0;
+  let d=new Date();
+  // check today first - only count if all done
+  const todayKey=d.toISOString().slice(0,10);
+  const todayComplete=records[todayKey]&&config.slots.every((_,i)=>records[todayKey][i]);
+  if(todayComplete){
+    streak=1;
+    d.setDate(d.getDate()-1);
+  }else{
+    d.setDate(d.getDate()-1);
+  }
+  while(true){
+    const key=d.toISOString().slice(0,10);
+    if(records[key]&&config.slots.every((_,i)=>records[key][i])){
+      streak++;
+      d.setDate(d.getDate()-1);
+    }else break;
+  }
+  document.getElementById('streakNum').textContent=streak;
+}
+
+/* ======== CONFETTI ======== */
+function launchConfetti(){
+  const c=document.createElement('div');
+  c.className='confetti-container';
+  const colors=['#4fc3f7','#ff8a65','#66bb6a','#ffee58','#ab47bc','#ef5350'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='confetti';
+    p.style.left=Math.random()*100+'%';
+    p.style.top=-10+'px';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay=Math.random()*0.5+'s';
+    p.style.width=(6+Math.random()*8)+'px';
+    p.style.height=(6+Math.random()*8)+'px';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),2500);
+}
+
+/* ======== HISTORY ======== */
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  list.innerHTML='';
+  const keys=Object.keys(records).sort().reverse().slice(0,30);
+  if(keys.length===0){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-l)">まだ記録がありません</div>';
+    return;
+  }
+  keys.forEach(k=>{
+    const rec=records[k];
+    const d=new Date(k);
+    const wd=['日','月','火','水','木','金','土'][d.getDay()];
+    const div=document.createElement('div');
+    div.className='history-item';
+    let badges='';
+    config.slots.forEach((s,i)=>{
+      const done=!!rec[i];
+      badges+=`<div class="history-badge ${done?'done':'missed'}">${done?'✓':'✗'}</div>`;
+    });
+    div.innerHTML=`
+      <div class="history-date">${k.slice(5).replace('-','/')}（${wd}）</div>
+      <div class="history-badges">${badges}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* ======== TABS ======== */
+function switchTab(name){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    n.classList.toggle('active',i===(name==='Home'?0:1));
+  });
+  if(name==='History')renderHistory();
+}
+
+/* ======== SETTINGS ======== */
+function openSettings(){
+  renderSettingsForm();
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function renderSettingsForm(){
+  const wrap=document.getElementById('medGroups');
+  wrap.innerHTML='';
+  config.slots.forEach((slot,si)=>{
+    let medsHTML='';
+    slot.meds.forEach((m,mi)=>{
+      medsHTML+=`
+        <div class="med-row">
+          <input type="text" value="${m}" onchange="config.slots[${si}].meds[${mi}]=this.value" placeholder="おくすりの名前">
+          ${slot.meds.length>1?`<button class="btn-remove" onclick="removeMed(${si},${mi})">✕</button>`:''}
+        </div>`;
+    });
+    wrap.innerHTML+=`
+      <div class="med-group">
+        <div class="med-group-title">🕐 ${slot.label}</div>
+        <div class="med-row">
+          <input type="time" value="${slot.time}" onchange="config.slots[${si}].time=this.value">
+        </div>
+        ${medsHTML}
+        <button class="btn-add-med" onclick="addMed(${si})">＋ おくすりを追加</button>
+      </div>`;
+  });
+}
+function addMed(si){config.slots[si].meds.push('');renderSettingsForm()}
+function removeMed(si,mi){config.slots[si].meds.splice(mi,1);renderSettingsForm()}
+function saveSettings(){
+  saveConfig();
+  closeSettings();
+  setupNotifications();
+  render();
+}
+
+/* ======== PWA & NOTIFICATIONS ======== */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
+
+async function setupNotifications(){
+  if(!('Notification' in window))return;
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted')return;
+  scheduleLocalAlarms();
+}
+
+function scheduleLocalAlarms(){
+  // Clear existing
+  if(window._alarmTimers)window._alarmTimers.forEach(t=>clearTimeout(t));
+  window._alarmTimers=[];
+
+  const now=new Date();
+  config.slots.forEach((slot,i)=>{
+    const [h,m]=slot.time.split(':').map(Number);
+    const target=new Date();
+    target.setHours(h,m,0,0);
+    if(target<=now)return; // already passed today
+
+    const delay=target-now;
+    const timer=setTimeout(()=>{
+      const rec=todayRec();
+      if(!rec[i]){
+        // Vibrate
+        if(navigator.vibrate)navigator.vibrate([300,100,300,100,300]);
+        // Sound
+        try{
+          const ctx=new(window.AudioContext||window.webkitAudioContext)();
+          const osc=ctx.createOscillator();
+          const gain=ctx.createGain();
+          osc.connect(gain);gain.connect(ctx.destination);
+          osc.frequency.value=880;
+          gain.gain.value=0.3;
+          osc.start();
+          setTimeout(()=>{osc.stop();ctx.close()},1000);
+        }catch(e){}
+        // Notification
+        if(Notification.permission==='granted'){
+          new Notification('ふくやくん 💊',{
+            body:`${slot.label}のおくすりの時間です！`,
+            icon:'💊',
+            tag:'fukuyakun-'+i,
+            requireInteraction:true
+          });
+        }
+      }
+    },delay);
+    window._alarmTimers.push(timer);
+  });
+}
+
+/* ======== DAILY RESET CHECK ======== */
+let _currentDay=today();
+setInterval(()=>{
+  if(today()!==_currentDay){
+    _currentDay=today();
+    render();
+    scheduleLocalAlarms();
+  }
+},60000);
+
+/* ======== INIT ======== */
+render();
+setupNotifications();
+
+// First visit: open settings
+if(!localStorage.getItem(SK+'_config')){
+  setTimeout(()=>openSettings(),800);
+}
+</script>
+</body>
+</html>
