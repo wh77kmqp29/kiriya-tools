@@ -52,15 +52,7 @@ body {
 }
 .en { font-family: 'Inter', sans-serif; }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: .4;
-}
+/* ★ 削除: body::before のSVGノイズオーバーレイ（GPU負荷の原因） */
 
 nav {
   position: fixed;
@@ -164,34 +156,32 @@ nav.scrolled {
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
 }
+/* ★ 軽量化: orbアニメーションを削除し、静的なグラデーション背景に変更 */
 .hero-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
   pointer-events: none;
+  will-change: auto; /* GPU昇格しない */
 }
 .hero-orb-1 {
   width: 700px; height: 700px;
   top: -200px; right: -100px;
   background: radial-gradient(circle, rgba(37,99,235,.25) 0%, transparent 70%);
-  animation: orbFloat 8s ease-in-out infinite;
+  /* アニメーション削除 */
 }
 .hero-orb-2 {
   width: 500px; height: 500px;
   bottom: -150px; left: -100px;
   background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%);
-  animation: orbFloat 10s ease-in-out infinite reverse;
 }
 .hero-orb-3 {
   width: 300px; height: 300px;
   top: 40%; left: 45%;
   background: radial-gradient(circle, rgba(6,182,212,.12) 0%, transparent 70%);
-  animation: orbFloat 12s ease-in-out infinite 3s;
 }
-@keyframes orbFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50%       { transform: translateY(-30px) scale(1.05); }
-}
+
+/* ★ パーティクル: 数を10個に削減し、will-changeで最適化 */
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -200,16 +190,18 @@ nav.scrolled {
 .particle {
   position: absolute;
   width: 2px; height: 2px;
-  background: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.4);
   border-radius: 50%;
+  will-change: transform, opacity;
   animation: particleFloat linear infinite;
 }
 @keyframes particleFloat {
   0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { transform: translateY(-20px) translateX(30px); opacity: 0; }
+  10%  { opacity: .6; }
+  90%  { opacity: .6; }
+  100% { transform: translateY(-20px) translateX(20px); opacity: 0; }
 }
+
 .hero-content {
   position: relative;
   z-index: 2;
@@ -221,7 +213,6 @@ nav.scrolled {
   gap: 80px;
   align-items: center;
 }
-.hero-text {}
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -321,7 +312,6 @@ nav.scrolled {
   border: 1px solid rgba(255,255,255,.2);
   color: rgba(255,255,255,.7);
   transition: border-color .2s, color .2s, background .2s;
-  backdrop-filter: blur(4px);
 }
 .btn-outline-white:hover {
   border-color: rgba(255,255,255,.5);
@@ -331,28 +321,31 @@ nav.scrolled {
 .hero-card-stack {
   position: relative;
   height: 420px;
+  perspective: 800px;
 }
 .hcard {
   position: absolute;
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(255,255,255,.1);
   border-radius: var(--r-lg);
-  backdrop-filter: blur(12px);
   padding: 24px 28px;
   color: #fff;
   box-shadow: 0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  /* ★ backdrop-filter削除 → 軽量化 */
 }
 .hcard-main {
   width: 100%;
   top: 40px;
   left: 0;
   animation: cardFloat 5s ease-in-out infinite;
+  will-change: transform;
 }
 .hcard-stat1 {
   width: 200px;
   bottom: 20px;
   left: -20px;
   animation: cardFloat 6s ease-in-out infinite 1s;
+  will-change: transform;
   background: rgba(37,99,235,.15);
   border-color: rgba(37,99,235,.3);
 }
@@ -361,6 +354,7 @@ nav.scrolled {
   top: 10px;
   right: -10px;
   animation: cardFloat 7s ease-in-out infinite 2s;
+  will-change: transform;
   background: rgba(6,182,212,.1);
   border-color: rgba(6,182,212,.25);
 }
@@ -508,6 +502,7 @@ nav.scrolled {
   gap: 0;
   width: max-content;
   animation: marquee 22s linear infinite;
+  will-change: transform;
 }
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -744,40 +739,6 @@ nav.scrolled {
   background: var(--blue-dim);
   transform: translateY(-2px) scale(1.03);
 }
-.pcard--coming {
-  border-style: dashed;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-}
-.pcard--coming .pcard-accent-bar {
-  background: linear-gradient(90deg, #cbd5e1, #e2e8f0);
-}
-.pcard--coming:hover {
-  box-shadow: none;
-  border-color: #cbd5e1;
-  transform: none;
-}
-.coming-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  min-height: 220px;
-  gap: 10px;
-}
-.coming-badge {
-  font-family: 'Inter', sans-serif;
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 100px;
-  background: #e2e8f0;
-  color: #94a3b8;
-}
-.coming-title { font-size: 1rem; font-weight: 700; color: #94a3b8; }
-.coming-desc  { font-size: .82rem; color: #b0bec5; line-height: 1.6; }
 
 #features {
   background: var(--dark2);
@@ -1060,7 +1021,6 @@ nav.scrolled {
   color: rgba(255,255,255,.35);
   margin-top: 2px;
 }
-.about-text-side {}
 .about-text-side p {
   font-size: .95rem;
   color: var(--text-mid);
@@ -1076,10 +1036,6 @@ nav.scrolled {
   padding-left: 16px;
   margin: 24px 0;
   line-height: 1.7;
-}
-.about-stack-note {
-  font-size: .82rem;
-  color: var(--text-muted);
 }
 .about-stack-note-en {
   font-family: 'Inter', sans-serif;
@@ -1159,7 +1115,6 @@ footer {
   gap: 60px;
   margin-bottom: 48px;
 }
-.footer-brand {}
 .footer-logo {
   font-family: 'Inter', sans-serif;
   font-weight: 900;
@@ -1251,20 +1206,34 @@ footer {
   color: rgba(255,255,255,.15);
 }
 
+/* ★ reveal: 軽量化 - will-changeを使い、GPUコンポジットを最適化 */
 .reveal {
   opacity: 0;
   transform: translateY(32px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
+  will-change: opacity, transform;
 }
 .reveal.from-left  { transform: translateX(-32px); }
 .reveal.from-right { transform: translateX(32px); }
 .reveal.visible {
   opacity: 1;
   transform: translate(0);
+  will-change: auto; /* アニメーション完了後にGPUメモリ解放 */
 }
 .reveal-delay-1 { transition-delay: .1s; }
 .reveal-delay-2 { transition-delay: .2s; }
 .reveal-delay-3 { transition-delay: .3s; }
+
+/* ★ prefers-reduced-motion: アニメーション軽減設定のユーザー向け */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .marquee-inner { animation: none; }
+}
 
 @media (max-width: 1024px) {
   .hero-content    { grid-template-columns: 1fr; gap: 60px; padding-top: 140px; }
@@ -1367,7 +1336,7 @@ footer {
           <span class="hcard-tag en">オフライン動作</span>
         </div>
         <div class="hcard-price-row">
-          <div class="hcard-price en">¥2,980<small>（税込）</small></div>
+          <div class="hcard-price en">¥500<small>（税込）</small></div>
           <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="hcard-buy-btn en" target="_blank">購入する →</a>
         </div>
       </div>
@@ -1437,11 +1406,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥2,980</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="invoice/index.html" class="btn-demo en">デモを試す</a>
+            <a href="invoice/index.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=fa321ed6-2491-4559-988e-2d2b1c97d0e2" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1466,11 +1435,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥1,480</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="health-worklog.html" class="btn-demo en">デモを試す</a>
+            <a href="health-worklog.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22b3215d-1fff-45e0-8b75-34750221ff08" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1495,11 +1464,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥1,980</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="lecturenote-business.html" class="btn-demo en">デモを試す</a>
+            <a href="lecturenote-business.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=c8b13c42-464c-487f-82fa-21974cbbb96d" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1508,7 +1477,7 @@ footer {
         </div>
       </article>
 
-            <!-- ★ 商品4: DocFlow 見積書 -->
+      <!-- ★ 商品4: DocFlow 見積書 -->
       <article class="pcard reveal reveal-delay-1">
         <div class="pcard-accent-bar"></div>
         <div class="pcard-body">
@@ -1524,11 +1493,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥980</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="docflow.html" class="btn-demo en">デモを試す</a>
+            <a href="docflow.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=4ac115ed-a831-4287-b010-bb2f68f0c7fd" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1553,11 +1522,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥980</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="docflow.html" class="btn-demo en">デモを試す</a>
+            <a href="docflow.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=2497caee-8942-4e65-9a86-8769985199d5" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1582,11 +1551,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥980</div>
+            <div class="pcard-price en">¥500</div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="docflow.html" class="btn-demo en">デモを試す</a>
+            <a href="docflow.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=08c791cd-66ea-4617-9416-9a8316aae96f" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1612,11 +1581,11 @@ footer {
         </div>
         <div class="pcard-footer">
           <div>
-            <div class="pcard-price en">¥1,980 <s style="font-size:.7rem;color:#888;font-weight:400">¥2,940</s></div>
+            <div class="pcard-price en">¥1,000 <s style="font-size:.7rem;color:#888;font-weight:400">¥1,500</s></div>
             <span class="pcard-price-note">税込・買い切り・永久利用</span>
           </div>
           <div class="pcard-btns">
-            <a href="docflow.html" class="btn-demo en">デモを試す</a>
+            <a href="docflow.html" class="btn-demo">無料で使う（透かしあり）</a>
             <a href="https://buy.polar.sh/polar_cl_SugZvKXzvNYb0pb9ll0QXOm83sGn8NRpbKX4S4S6XFL?product_id=22dafa1b-f062-41f3-bfce-477e3064bf26" class="btn-detail en" target="_blank">
               購入する
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1652,7 +1621,7 @@ footer {
           </div>
           <div class="compare-col compare-col--good">
             <div class="compare-head en">Kiriya Tools</div>
-            <div class="compare-item"><span class="ci">✓</span> 買い切り ¥1,480〜</div>
+            <div class="compare-item"><span class="ci">✓</span> 買い切り ¥500〜¥1,000</div>
             <div class="compare-item"><span class="ci">✓</span> 2年目以降 ¥0</div>
             <div class="compare-item"><span class="ci">✓</span> 解約不要・永久利用</div>
             <div class="compare-item"><span class="ci">✓</span> 価格固定・追加なし</div>
@@ -1794,11 +1763,20 @@ footer {
 (function () {
   'use strict';
 
+  /* ★ ナビゲーション: スクロール検知（passive + throttle） */
   var navbar = document.getElementById('navbar');
+  var ticking = false;
   window.addEventListener('scroll', function () {
-    navbar.classList.toggle('scrolled', window.scrollY > 20);
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(function () {
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
+        ticking = false;
+      });
+    }
   }, { passive: true });
 
+  /* ★ ハンバーガーメニュー */
   window.toggleNav = function () {
     document.getElementById('navLinks').classList.toggle('open');
   };
@@ -1808,24 +1786,26 @@ footer {
     });
   });
 
+  /* ★ パーティクル: 28個→10個に削減（カクつきの主原因だった） */
   var container = document.getElementById('particles');
-  for (var i = 0; i < 28; i++) {
-    (function () {
-      var p = document.createElement('div');
-      p.className = 'particle';
-      var size = Math.random() * 2.5 + 1;
-      p.style.cssText = [
-        'width:'  + size + 'px',
-        'height:' + size + 'px',
-        'left:'   + Math.random() * 100 + '%',
-        'animation-duration:' + (Math.random() * 14 + 8) + 's',
-        'animation-delay:'    + (Math.random() * 10) + 's',
-        'opacity:' + (Math.random() * .5 + .1),
-      ].join(';');
-      container.appendChild(p);
-    })();
+  var PARTICLE_COUNT = 10;
+  var frag = document.createDocumentFragment();
+  for (var i = 0; i < PARTICLE_COUNT; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var size = Math.random() * 2 + 1;
+    p.style.cssText =
+      'width:' + size + 'px;' +
+      'height:' + size + 'px;' +
+      'left:' + (Math.random() * 100) + '%;' +
+      'animation-duration:' + (Math.random() * 12 + 10) + 's;' +
+      'animation-delay:' + (Math.random() * 8) + 's;' +
+      'opacity:' + (Math.random() * .4 + .1);
+    frag.appendChild(p);
   }
+  container.appendChild(frag);
 
+  /* ★ スクロール表示アニメーション（IntersectionObserver） */
   var reveals = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
     var revealObs = new IntersectionObserver(function (entries) {
@@ -1841,30 +1821,48 @@ footer {
     reveals.forEach(function (el) { el.classList.add('visible'); });
   }
 
+  /* ★ アクティブナビリンク: スクロールイベントをrAFでスロットル */
   var sections = document.querySelectorAll('section[id]');
-  var navAs    = document.querySelectorAll('.nav-links a:not(.nav-pill)');
+  var navAs = document.querySelectorAll('.nav-links a:not(.nav-pill)');
+  var navTicking = false;
   window.addEventListener('scroll', function () {
-    var scrollY = window.scrollY + 100;
-    sections.forEach(function (sec) {
-      var top    = sec.offsetTop;
-      var bottom = top + sec.offsetHeight;
-      var id     = sec.id;
-      var link   = document.querySelector('.nav-links a[href="#' + id + '"]');
-      if (link && scrollY >= top && scrollY < bottom) {
-        navAs.forEach(function (a) { a.style.color = ''; });
-        link.style.color = 'rgba(255,255,255,.95)';
-      }
-    });
+    if (!navTicking) {
+      navTicking = true;
+      requestAnimationFrame(function () {
+        var scrollY = window.scrollY + 100;
+        sections.forEach(function (sec) {
+          var top = sec.offsetTop;
+          var bottom = top + sec.offsetHeight;
+          var id = sec.id;
+          var link = document.querySelector('.nav-links a[href="#' + id + '"]');
+          if (link && scrollY >= top && scrollY < bottom) {
+            navAs.forEach(function (a) { a.style.color = ''; });
+            link.style.color = 'rgba(255,255,255,.95)';
+          }
+        });
+        navTicking = false;
+      });
+    }
   }, { passive: true });
 
+  /* ★ カードスタック マウス追従: rAFでスロットル */
   var stack = document.querySelector('.hero-card-stack');
   if (stack) {
+    var mouseTicking = false;
+    var lastMx = 0, lastMy = 0;
     document.addEventListener('mousemove', function (e) {
-      var mx = (e.clientX / window.innerWidth  - .5) * 16;
-      var my = (e.clientY / window.innerHeight - .5) * 10;
-      stack.style.transform = 'rotateY(' + mx + 'deg) rotateX(' + (-my) + 'deg)';
-      stack.style.transition = 'transform .1s ease';
-    });
+      lastMx = e.clientX;
+      lastMy = e.clientY;
+      if (!mouseTicking) {
+        mouseTicking = true;
+        requestAnimationFrame(function () {
+          var mx = (lastMx / window.innerWidth - .5) * 12;
+          var my = (lastMy / window.innerHeight - .5) * 8;
+          stack.style.transform = 'rotateY(' + mx + 'deg) rotateX(' + (-my) + 'deg)';
+          mouseTicking = false;
+        });
+      }
+    }, { passive: true });
   }
 
 })();
