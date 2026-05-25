@@ -678,7 +678,7 @@ body {
     <div class="license-section">
       <div class="section-title">ライセンス</div>
       <p style="font-size:0.7rem;color:#888;margin-bottom:8px;">ウォーターマークを削除するにはライセンスキーを入力してください。</p>
-      <a href="#" id="purchase-link" target="_blank" style="font-size:0.75rem;color:#00d2ff;display:block;margin-bottom:8px;">→ ¥500で購入する (Polar.sh)</a>
+      <a href="https://kiriya-tools.polar.sh/checkout?productId=33622a06-b3b4-4c0a-adc1-ea7816d12d47" id="purchase-link" target="_blank" style="font-size:0.75rem;color:#00d2ff;display:block;margin-bottom:8px;">→ ¥500で購入する (Polar.sh)</a>
       <div class="license-row">
         <input type="text" id="inp-license" placeholder="ライセンスキー">
         <button onclick="validateLicense()">認証</button>
@@ -710,9 +710,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('kiriya-card-license');
   if (saved === 'activated') {
     isLicensed = true;
-    document.getElementById('watermark').style.display = 'none';
     document.getElementById('license-status').textContent = '✓ ライセンス認証済み';
     document.getElementById('license-status').className = 'license-status valid';
+    updatePreview();
   }
 });
 
@@ -994,40 +994,26 @@ async function validateLicense() {
     const res = await fetch('https://api.polar.sh/v1/customer-portal/license-keys/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: key, organization_id: '' })
+      body: JSON.stringify({
+        key: key,
+        organization_id: 'ff9b0c8c-c690-4aa4-865f-9902dd92804b'
+      })
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data.status === 'granted' || data.status === 'active') {
-        isLicensed = true;
-        localStorage.setItem('kiriya-card-license', 'activated');
-        status.textContent = '✓ ライセンス認証成功！ウォーターマークを削除しました。';
-        status.className = 'license-status valid';
-        updatePreview();
-      } else {
-        status.textContent = '✗ 無効なライセンスキーです';
-        status.className = 'license-status invalid';
-      }
+    const data = await res.json();
+
+    if (res.ok && (data.status === 'granted' || data.status === 'active')) {
+      isLicensed = true;
+      localStorage.setItem('kiriya-card-license', 'activated');
+      status.textContent = '✓ ライセンス認証成功！ウォーターマークを削除しました。';
+      status.className = 'license-status valid';
+      updatePreview();
     } else {
-      // Fallback: simple local validation for testing
-      fallbackValidation(key, status);
+      status.textContent = '✗ 無効なライセンスキーです';
+      status.className = 'license-status invalid';
     }
   } catch (e) {
-    fallbackValidation(key, status);
-  }
-}
-
-function fallbackValidation(key, status) {
-  // Placeholder: accept keys that match a pattern (replace with real Polar.sh integration later)
-  if (key.length >= 8) {
-    isLicensed = true;
-    localStorage.setItem('kiriya-card-license', 'activated');
-    status.textContent = '✓ ライセンス認証成功！';
-    status.className = 'license-status valid';
-    updatePreview();
-  } else {
-    status.textContent = '✗ 無効なライセンスキーです';
+    status.textContent = '✗ 認証サーバーに接続できません。もう一度お試しください。';
     status.className = 'license-status invalid';
   }
 }
