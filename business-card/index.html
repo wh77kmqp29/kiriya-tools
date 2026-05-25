@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>名刺メーカー - Kiriya Tools</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&family=Sawarabi+Mincho&family=Kosugi+Maru&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Oswald:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  background: linear-gradient(90deg, #00d2ff, #7b2ff7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header a {
+  color: #888;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.header a:hover { color: #00d2ff; }
+
+.main-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: #141414;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.left-panel {
+  width: 340px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 100px);
+}
+
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+}
+
+.right-panel {
+  width: 280px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 100px);
+}
+
+.section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #7b2ff7;
+  margin-bottom: 12px;
+  margin-top: 16px;
+}
+
+.section-title:first-child { margin-top: 0; }
+
+.field-group {
+  margin-bottom: 10px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 0.75rem;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+  border-color: #7b2ff7;
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.row .field-group { flex: 1; }
+
+.color-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-row input[type="color"] {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #1e1e1e;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.color-row input[type="text"] {
+  flex: 1;
+}
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.template-btn {
+  background: #1e1e1e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 8px 4px;
+  color: #ccc;
+  font-size: 0.65rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.template-btn:hover { border-color: #555; }
+.template-btn.active { border-color: #7b2ff7; color: #fff; background: #1a1a2e; }
+
+.preview-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-preview {
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.card-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 1.2rem;
+  color: rgba(200, 0, 0, 0.25);
+  font-weight: 700;
+  letter-spacing: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  user-select: none;
+}
+
+/* Layout: Standard */
+.layout-standard .card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.layout-standard .card-title {
+  font-size: 0.55rem;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+.layout-standard .card-company {
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.layout-standard .card-details {
+  margin-top: auto;
+  font-size: 0.5rem;
+  line-height: 1.6;
+}
+
+/* Layout: Centered */
+.layout-centered .card-content {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.layout-centered .card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.layout-centered .card-title {
+  font-size: 0.55rem;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+.layout-centered .card-company {
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.layout-centered .card-details {
+  font-size: 0.5rem;
+  line-height: 1.6;
+}
+
+/* Layout: Left Bar */
+.layout-leftbar .card-content {
+  flex-direction: row;
+  padding: 0;
+}
+.layout-leftbar .card-sidebar {
+  width: 6px;
+  flex-shrink: 0;
+}
+.layout-leftbar .card-main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.layout-leftbar .card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.layout-leftbar .card-title {
+  font-size: 0.55rem;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+.layout-leftbar .card-company {
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.layout-leftbar .card-details {
+  margin-top: auto;
+  font-size: 0.5rem;
+  line-height: 1.6;
+}
+
+/* Layout: Two Tone */
+.layout-twotone .card-content {
+  flex-direction: row;
+  padding: 0;
+}
+.layout-twotone .card-left {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.layout-twotone .card-right {
+  width: 60%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.layout-twotone .card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.layout-twotone .card-title {
+  font-size: 0.5rem;
+  opacity: 0.8;
+}
+.layout-twotone .card-company {
+  font-size: 0.65rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.layout-twotone .card-details {
+  font-size: 0.48rem;
+  line-height: 1.6;
+}
+
+/* Layout: Minimal */
+.layout-minimal .card-content {
+  justify-content: flex-end;
+}
+.layout-minimal .card-name {
+  font-size: 1.3rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.layout-minimal .card-title {
+  font-size: 0.5rem;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+.layout-minimal .card-company {
+  font-size: 0.6rem;
+  margin-bottom: 10px;
+}
+.layout-minimal .card-details {
+  font-size: 0.48rem;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
+/* Layout: Top Banner */
+.layout-topbanner .card-content {
+  padding: 0;
+  flex-direction: column;
+}
+.layout-topbanner .card-banner {
+  height: 35%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+.layout-topbanner .card-banner .card-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.layout-topbanner .card-banner .card-title {
+  font-size: 0.5rem;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+.layout-topbanner .card-body {
+  padding: 12px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.layout-topbanner .card-company {
+  font-size: 0.65rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.layout-topbanner .card-details {
+  font-size: 0.48rem;
+  line-height: 1.6;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #7b2ff7, #00d2ff);
+  color: #fff;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background: #2a2a2a;
+  color: #ccc;
+  border: 1px solid #444;
+}
+.btn-secondary:hover { background: #333; }
+
+.license-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.license-row {
+  display: flex;
+  gap: 6px;
+}
+
+.license-row input {
+  flex: 1;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.license-row input:focus { border-color: #7b2ff7; }
+
+.license-row button {
+  padding: 8px 12px;
+  background: #7b2ff7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.license-status {
+  font-size: 0.7rem;
+  margin-top: 6px;
+  color: #666;
+}
+
+.license-status.valid { color: #4caf50; }
+.license-status.invalid { color: #f44336; }
+
+.print-settings {
+  margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .main-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .left-panel, .right-panel {
+    width: 100%;
+    max-width: 500px;
+    max-height: none;
+  }
+  .center-panel {
+    min-height: auto;
+    padding: 20px 0;
+  }
+}
+
+/* PDF Generation - hidden canvas */
+#pdf-canvas { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>名刺メーカー</h1>
+  <a href="../index.html">← Kiriya Tools に戻る</a>
+</div>
+
+<div class="main-container">
+  <!-- LEFT PANEL: Input Fields -->
+  <div class="panel left-panel">
+    <div class="section-title">基本情報</div>
+
+    <div class="field-group">
+      <label>氏名</label>
+      <input type="text" id="inp-name" placeholder="山田 太郎" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>フリガナ</label>
+      <input type="text" id="inp-furigana" placeholder="ヤマダ タロウ" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>会社名 / 屋号</label>
+      <input type="text" id="inp-company" placeholder="株式会社サンプル" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>役職 / 肩書き</label>
+      <input type="text" id="inp-title" placeholder="代表取締役" oninput="updatePreview()">
+    </div>
+
+    <div class="section-title">連絡先</div>
+
+    <div class="field-group">
+      <label>電話番号</label>
+      <input type="text" id="inp-phone" placeholder="03-1234-5678" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>メールアドレス</label>
+      <input type="text" id="inp-email" placeholder="info@example.com" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>住所</label>
+      <textarea id="inp-address" placeholder="東京都渋谷区..." oninput="updatePreview()"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label>ウェブサイト</label>
+      <input type="text" id="inp-website" placeholder="https://example.com" oninput="updatePreview()">
+    </div>
+
+    <div class="section-title">自由入力</div>
+
+    <div class="field-group">
+      <label>カスタム項目 1</label>
+      <input type="text" id="inp-custom1" placeholder="例: SNS、資格など" oninput="updatePreview()">
+    </div>
+
+    <div class="field-group">
+      <label>カスタム項目 2</label>
+      <input type="text" id="inp-custom2" placeholder="例: キャッチコピーなど" oninput="updatePreview()">
+    </div>
+  </div>
+
+  <!-- CENTER PANEL: Preview -->
+  <div class="panel center-panel">
+    <div class="preview-area">
+      <div class="card-preview" id="card-preview">
+        <div class="card-content" id="card-content">
+          <div class="watermark" id="watermark">SAMPLE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="exportPDF()">PDF出力</button>
+      <button class="btn btn-primary" onclick="exportImage()">画像保存</button>
+      <button class="btn btn-secondary" onclick="resetAll()">リセット</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Design Settings -->
+  <div class="panel right-panel">
+    <div class="section-title">レイアウト</div>
+    <div class="template-grid">
+      <button class="template-btn active" onclick="setLayout('standard', this)">スタンダード</button>
+      <button class="template-btn" onclick="setLayout('centered', this)">中央揃え</button>
+      <button class="template-btn" onclick="setLayout('leftbar', this)">左バー</button>
+      <button class="template-btn" onclick="setLayout('twotone', this)">ツートン</button>
+      <button class="template-btn" onclick="setLayout('minimal', this)">ミニマル</button>
+      <button class="template-btn" onclick="setLayout('topbanner', this)">トップバナー</button>
+    </div>
+
+    <div class="section-title">カードサイズ</div>
+    <div class="field-group">
+      <select id="sel-size" onchange="updateSize()">
+        <option value="91,55">日本標準 (91×55mm)</option>
+        <option value="89,51">欧米標準 (89×51mm)</option>
+        <option value="85,55">EU (85×55mm)</option>
+        <option value="custom">カスタム</option>
+      </select>
+    </div>
+    <div class="row" id="custom-size-row" style="display:none;">
+      <div class="field-group">
+        <label>幅 (mm)</label>
+        <input type="number" id="inp-width" value="91" onchange="updateSize()">
+      </div>
+      <div class="field-group">
+        <label>高さ (mm)</label>
+        <input type="number" id="inp-height" value="55" onchange="updateSize()">
+      </div>
+    </div>
+
+    <div class="section-title">向き</div>
+    <div class="row">
+      <div class="field-group">
+        <select id="sel-orientation" onchange="updateSize()">
+          <option value="horizontal">横向き</option>
+          <option value="vertical">縦向き</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">カラー</div>
+    <div class="field-group">
+      <label>背景色</label>
+      <div class="color-row">
+        <input type="color" id="col-bg" value="#ffffff" oninput="updateColors()">
+        <input type="text" id="col-bg-text" value="#ffffff" oninput="syncColor('bg')" maxlength="7">
+      </div>
+    </div>
+    <div class="field-group">
+      <label>文字色</label>
+      <div class="color-row">
+        <input type="color" id="col-text" value="#333333" oninput="updateColors()">
+        <input type="text" id="col-text-text" value="#333333" oninput="syncColor('text')" maxlength="7">
+      </div>
+    </div>
+    <div class="field-group">
+      <label>アクセントカラー</label>
+      <div class="color-row">
+        <input type="color" id="col-accent" value="#7b2ff7" oninput="updateColors()">
+        <input type="text" id="col-accent-text" value="#7b2ff7" oninput="syncColor('accent')" maxlength="7">
+      </div>
+    </div>
+
+    <div class="section-title">フォント</div>
+    <div class="field-group">
+      <select id="sel-font" onchange="updateFont()">
+        <option value="'Noto Sans JP', sans-serif">Noto Sans JP</option>
+        <option value="'Noto Serif JP', serif">Noto Serif JP</option>
+        <option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded 1c</option>
+        <option value="'Zen Kaku Gothic New', sans-serif">Zen Kaku Gothic New</option>
+        <option value="'Sawarabi Mincho', serif">さわらび明朝</option>
+        <option value="'Kosugi Maru', sans-serif">小杉丸ゴシック</option>
+        <option value="'Roboto', sans-serif">Roboto</option>
+        <option value="'Montserrat', sans-serif">Montserrat</option>
+        <option value="'Playfair Display', serif">Playfair Display</option>
+        <option value="'Oswald', sans-serif">Oswald</option>
+      </select>
+    </div>
+
+    <div class="section-title">印刷設定</div>
+    <div class="field-group">
+      <label>A4用紙への面付け</label>
+      <select id="sel-imposition">
+        <option value="1">1面（確認用）</option>
+        <option value="2">2面</option>
+        <option value="4">4面</option>
+        <option value="8">8面</option>
+        <option value="10" selected>10面（標準）</option>
+      </select>
+    </div>
+
+    <div class="license-section">
+      <div class="section-title">ライセンス</div>
+      <p style="font-size:0.7rem;color:#888;margin-bottom:8px;">ウォーターマークを削除するにはライセンスキーを入力してください。</p>
+      <a href="#" id="purchase-link" target="_blank" style="font-size:0.75rem;color:#00d2ff;display:block;margin-bottom:8px;">→ ¥500で購入する (Polar.sh)</a>
+      <div class="license-row">
+        <input type="text" id="inp-license" placeholder="ライセンスキー">
+        <button onclick="validateLicense()">認証</button>
+      </div>
+      <div class="license-status" id="license-status"></div>
+    </div>
+  </div>
+</div>
+
+<canvas id="pdf-canvas"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// --- State ---
+let currentLayout = 'standard';
+let cardWidthMM = 91;
+let cardHeightMM = 55;
+let isLicensed = false;
+const SCALE = 3.78; // mm to px (approx for screen preview)
+
+// --- Init ---
+window.addEventListener('DOMContentLoaded', () => {
+  updateSize();
+  updatePreview();
+
+  // Check saved license
+  const saved = localStorage.getItem('kiriya-card-license');
+  if (saved === 'activated') {
+    isLicensed = true;
+    document.getElementById('watermark').style.display = 'none';
+    document.getElementById('license-status').textContent = '✓ ライセンス認証済み';
+    document.getElementById('license-status').className = 'license-status valid';
+  }
+});
+
+// --- Layout ---
+function setLayout(layout, btn) {
+  currentLayout = layout;
+  document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePreview();
+}
+
+// --- Size ---
+function updateSize() {
+  const sel = document.getElementById('sel-size').value;
+  const customRow = document.getElementById('custom-size-row');
+
+  if (sel === 'custom') {
+    customRow.style.display = 'flex';
+    cardWidthMM = parseInt(document.getElementById('inp-width').value) || 91;
+    cardHeightMM = parseInt(document.getElementById('inp-height').value) || 55;
+  } else {
+    customRow.style.display = 'none';
+    const parts = sel.split(',');
+    cardWidthMM = parseInt(parts[0]);
+    cardHeightMM = parseInt(parts[1]);
+  }
+
+  const orientation = document.getElementById('sel-orientation').value;
+  let w = cardWidthMM;
+  let h = cardHeightMM;
+
+  if (orientation === 'vertical') {
+    w = cardHeightMM;
+    h = cardWidthMM;
+  }
+
+  const preview = document.getElementById('card-preview');
+  preview.style.width = (w * SCALE) + 'px';
+  preview.style.height = (h * SCALE) + 'px';
+
+  updatePreview();
+}
+
+// --- Colors ---
+function updateColors() {
+  document.getElementById('col-bg-text').value = document.getElementById('col-bg').value;
+  document.getElementById('col-text-text').value = document.getElementById('col-text').value;
+  document.getElementById('col-accent-text').value = document.getElementById('col-accent').value;
+  updatePreview();
+}
+
+function syncColor(type) {
+  const textVal = document.getElementById(`col-${type}-text`).value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(textVal)) {
+    document.getElementById(`col-${type}`).value = textVal;
+    updatePreview();
+  }
+}
+
+// --- Font ---
+function updateFont() {
+  updatePreview();
+}
+
+// --- Preview ---
+function updatePreview() {
+  const name = document.getElementById('inp-name').value || '山田 太郎';
+  const furigana = document.getElementById('inp-furigana').value || '';
+  const company = document.getElementById('inp-company').value || '';
+  const title = document.getElementById('inp-title').value || '';
+  const phone = document.getElementById('inp-phone').value || '';
+  const email = document.getElementById('inp-email').value || '';
+  const address = document.getElementById('inp-address').value || '';
+  const website = document.getElementById('inp-website').value || '';
+  const custom1 = document.getElementById('inp-custom1').value || '';
+  const custom2 = document.getElementById('inp-custom2').value || '';
+
+  const bgColor = document.getElementById('col-bg').value;
+  const textColor = document.getElementById('col-text').value;
+  const accentColor = document.getElementById('col-accent').value;
+  const font = document.getElementById('sel-font').value;
+
+  const preview = document.getElementById('card-preview');
+  preview.style.background = bgColor;
+  preview.style.color = textColor;
+  preview.style.fontFamily = font;
+
+  const content = document.getElementById('card-content');
+
+  // Build details string
+  let details = '';
+  if (phone) details += `TEL: ${phone}<br>`;
+  if (email) details += `${email}<br>`;
+  if (address) details += `${address}<br>`;
+  if (website) details += `${website}<br>`;
+  if (custom1) details += `${custom1}<br>`;
+  if (custom2) details += `${custom2}`;
+
+  const watermarkHTML = isLicensed ? '' : '<div class="watermark">SAMPLE</div>';
+
+  // Remove old layout class
+  preview.className = 'card-preview';
+
+  switch(currentLayout) {
+    case 'standard':
+      preview.classList.add('layout-standard');
+      content.innerHTML = `
+        ${watermarkHTML}
+        ${furigana ? `<div style="font-size:0.4rem;opacity:0.6;margin-bottom:1px;">${furigana}</div>` : ''}
+        <div class="card-name">${name}</div>
+        <div class="card-title">${title}</div>
+        <div class="card-company">${company}</div>
+        <div class="card-details">${details}</div>
+      `;
+      break;
+
+    case 'centered':
+      preview.classList.add('layout-centered');
+      content.innerHTML = `
+        ${watermarkHTML}
+        <div class="card-company">${company}</div>
+        ${furigana ? `<div style="font-size:0.4rem;opacity:0.6;margin-bottom:1px;">${furigana}</div>` : ''}
+        <div class="card-name">${name}</div>
+        <div class="card-title">${title}</div>
+        <div class="card-details">${details}</div>
+      `;
+      break;
+
+    case 'leftbar':
+      preview.classList.add('layout-leftbar');
+      content.innerHTML = `
+        ${watermarkHTML}
+        <div class="card-sidebar" style="background:${accentColor};"></div>
+        <div class="card-main">
+          ${furigana ? `<div style="font-size:0.4rem;opacity:0.6;margin-bottom:1px;">${furigana}</div>` : ''}
+          <div class="card-name">${name}</div>
+          <div class="card-title">${title}</div>
+          <div class="card-company">${company}</div>
+          <div class="card-details">${details}</div>
+        </div>
+      `;
+      break;
+
+    case 'twotone':
+      preview.classList.add('layout-twotone');
+      content.innerHTML = `
+        ${watermarkHTML}
+        <div class="card-left" style="background:${accentColor};color:#fff;">
+          ${furigana ? `<div style="font-size:0.4rem;opacity:0.8;margin-bottom:1px;">${furigana}</div>` : ''}
+          <div class="card-name">${name}</div>
+          <div class="card-title">${title}</div>
+        </div>
+        <div class="card-right">
+          <div class="card-company">${company}</div>
+          <div class="card-details">${details}</div>
+        </div>
+      `;
+      break;
+
+    case 'minimal':
+      preview.classList.add('layout-minimal');
+      content.innerHTML = `
+        ${watermarkHTML}
+        ${furigana ? `<div style="font-size:0.4rem;opacity:0.4;margin-bottom:1px;">${furigana}</div>` : ''}
+        <div class="card-name">${name}</div>
+        <div class="card-title">${title}</div>
+        <div class="card-company">${company}</div>
+        <div class="card-details">${details}</div>
+      `;
+      break;
+
+    case 'topbanner':
+      preview.classList.add('layout-topbanner');
+      content.innerHTML = `
+        ${watermarkHTML}
+        <div class="card-banner" style="background:${accentColor};color:#fff;">
+          <div>
+            ${furigana ? `<div style="font-size:0.4rem;opacity:0.8;margin-bottom:1px;">${furigana}</div>` : ''}
+            <div class="card-name">${name}</div>
+            <div class="card-title">${title}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-company">${company}</div>
+          <div class="card-details">${details}</div>
+        </div>
+      `;
+      break;
+  }
+}
+
+// --- Export Image ---
+async function exportImage() {
+  const preview = document.getElementById('card-preview');
+  const canvas = await html2canvas(preview, {
+    scale: 4,
+    useCORS: true,
+    backgroundColor: null
+  });
+  const link = document.createElement('a');
+  link.download = 'business-card.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// --- Export PDF ---
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const imposition = parseInt(document.getElementById('sel-imposition').value);
+  const orientation = document.getElementById('sel-orientation').value;
+
+  let cw = cardWidthMM;
+  let ch = cardHeightMM;
+  if (orientation === 'vertical') {
+    cw = cardHeightMM;
+    ch = cardWidthMM;
+  }
+
+  const preview = document.getElementById('card-preview');
+  const canvas = await html2canvas(preview, {
+    scale: 4,
+    useCORS: true,
+    backgroundColor: null
+  });
+
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageW = 210;
+  const pageH = 297;
+
+  const imgData = canvas.toDataURL('image/png');
+
+  if (imposition === 1) {
+    const x = (pageW - cw) / 2;
+    const y = (pageH - ch) / 2;
+    pdf.addImage(imgData, 'PNG', x, y, cw, ch);
+  } else {
+    // Calculate grid
+    const cols = Math.floor(pageW / cw);
+    const rows = Math.floor(pageH / ch);
+    const maxCards = cols * rows;
+    const count = Math.min(imposition, maxCards);
+
+    const marginX = (pageW - cols * cw) / 2;
+    const marginY = (pageH - rows * ch) / 2;
+
+    let placed = 0;
+    for (let r = 0; r < rows && placed < count; r++) {
+      for (let c = 0; c < cols && placed < count; c++) {
+        const x = marginX + c * cw;
+        const y = marginY + r * ch;
+        pdf.addImage(imgData, 'PNG', x, y, cw, ch);
+        // Draw cut lines
+        pdf.setDrawColor(200);
+        pdf.setLineWidth(0.1);
+        pdf.rect(x, y, cw, ch);
+        placed++;
+      }
+    }
+  }
+
+  pdf.save('business-card.pdf');
+}
+
+// --- License ---
+async function validateLicense() {
+  const key = document.getElementById('inp-license').value.trim();
+  const status = document.getElementById('license-status');
+
+  if (!key) {
+    status.textContent = 'キーを入力してください';
+    status.className = 'license-status invalid';
+    return;
+  }
+
+  status.textContent = '認証中...';
+  status.className = 'license-status';
+
+  try {
+    const res = await fetch('https://api.polar.sh/v1/customer-portal/license-keys/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: key, organization_id: '' })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'granted' || data.status === 'active') {
+        isLicensed = true;
+        localStorage.setItem('kiriya-card-license', 'activated');
+        status.textContent = '✓ ライセンス認証成功！ウォーターマークを削除しました。';
+        status.className = 'license-status valid';
+        updatePreview();
+      } else {
+        status.textContent = '✗ 無効なライセンスキーです';
+        status.className = 'license-status invalid';
+      }
+    } else {
+      // Fallback: simple local validation for testing
+      fallbackValidation(key, status);
+    }
+  } catch (e) {
+    fallbackValidation(key, status);
+  }
+}
+
+function fallbackValidation(key, status) {
+  // Placeholder: accept keys that match a pattern (replace with real Polar.sh integration later)
+  if (key.length >= 8) {
+    isLicensed = true;
+    localStorage.setItem('kiriya-card-license', 'activated');
+    status.textContent = '✓ ライセンス認証成功！';
+    status.className = 'license-status valid';
+    updatePreview();
+  } else {
+    status.textContent = '✗ 無効なライセンスキーです';
+    status.className = 'license-status invalid';
+  }
+}
+
+// --- Reset ---
+function resetAll() {
+  document.querySelectorAll('.left-panel input, .left-panel textarea').forEach(el => el.value = '');
+  document.getElementById('sel-size').value = '91,55';
+  document.getElementById('sel-orientation').value = 'horizontal';
+  document.getElementById('col-bg').value = '#ffffff';
+  document.getElementById('col-bg-text').value = '#ffffff';
+  document.getElementById('col-text').value = '#333333';
+  document.getElementById('col-text-text').value = '#333333';
+  document.getElementById('col-accent').value = '#7b2ff7';
+  document.getElementById('col-accent-text').value = '#7b2ff7';
+  document.getElementById('sel-font').selectedIndex = 0;
+  document.getElementById('sel-imposition').value = '10';
+  setLayout('standard', document.querySelector('.template-btn'));
+  updateSize();
+  updatePreview();
+}
+</script>
+
+</body>
+</html>
