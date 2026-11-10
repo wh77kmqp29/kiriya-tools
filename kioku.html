@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eef5ec">
+<title>記憶保管庫 — 画面に1件だけ、最初の一歩まで分けるタスクアプリ</title>
+<meta name="description" content="画面に出るのは今やること1件だけ。タスクを最初の一歩まで分けて、できた／まだを1タップで記録。登録不要・無料・データは端末の中だけ。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="記憶保管庫 — 1画面1タスクの着手支援アプリ">
+<meta property="og:description" content="タスクを見ると固まる日のために。画面に出すのは1件だけ、最初の一歩まで自動で分解、できた／まだを1タップで記録。登録不要・無料。">
+<meta name="twitter:card" content="summary">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="記憶保管庫">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{
+  --bg:#eef5ec;
+  --surface:#ffffff;
+  --surface-2:#f7faf7;
+  --ink:#22302a;
+  --muted:#6f8175;
+  --line:#dde7df;
+  --green:#4f8f68;
+  --green-strong:#2f6b4a;
+  --green-soft:#d9efe0;
+  --warn:#8d4032;
+  --warn-soft:#fdf0ec;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(34,48,42,.05),0 8px 24px rgba(34,48,42,.06);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+  font-size:16px;
+  line-height:1.7;
+  padding-bottom:88px;
+  text-wrap:pretty;
+}
+h1,h2,h3,p,ul{margin:0}
+ul{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+header.app{padding:22px 0 10px;text-align:center}
+.brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:1.15rem;letter-spacing:.02em}
+.brand-mark{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8fc4a5,#4f8f68)}
+.brand-sub{margin-top:4px;color:var(--muted);font-size:.8rem}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.card-title{font-size:.95rem;font-weight:700;margin-bottom:8px}
+.muted{color:var(--muted);font-size:.9rem}
+.small{font-size:.82rem}
+.mt{margin-top:10px}
+.mt-lg{margin-top:16px}
+
+/* ホーム */
+.now-label{font-size:.8rem;font-weight:700;color:var(--green-strong);letter-spacing:.06em;margin-bottom:6px}
+.now-name{font-size:1.5rem;line-height:1.45;font-weight:700;margin-bottom:10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.75rem;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.chip.due{background:#e6eefb;color:#3c5a92;border-color:#d6e2f7}
+.chip.genre{background:#f5efe3;color:#6b5225;border-color:#ecdfc9}
+.chip.doing{background:#fbf0d2;color:#8a6712;border-color:#f2e3bd}
+
+.first{
+  background:linear-gradient(180deg,#f2f9f4,#eaf5ee);
+  border:1px solid #cfe5d8;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:14px;
+}
+.first-label{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--green-strong)}
+.first-text{font-size:1.08rem;font-weight:700;margin:4px 0 2px}
+.first-progress{font-size:.78rem;color:var(--muted)}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  flex:1;min-width:140px;min-height:52px;
+  border:none;border-radius:12px;
+  background:var(--green);color:#fff;
+  font-weight:700;font-size:1rem;
+  padding:12px 16px;
+  transition:transform .06s ease,background .15s ease;
+}
+.btn:hover{background:#5f9d74}
+.btn:active{transform:scale(.985)}
+.btn.quiet{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+.btn.quiet:hover{background:#eef3ef}
+.btn.danger{background:var(--warn)}
+.btn.small{min-height:42px;font-size:.9rem;padding:8px 14px;flex:0 0 auto;min-width:0}
+
+.timer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.timer-num{font-variant-numeric:tabular-nums;font-size:1.9rem;font-weight:700;letter-spacing:.02em}
+.timer-num.done{color:var(--green-strong)}
+
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stat{flex:1;min-width:92px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.stat b{display:block;font-size:1.6rem;line-height:1.2;color:var(--green-strong);font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem;color:var(--muted)}
+
+/* タスク */
+.task{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+.task:last-child{border-bottom:none}
+.task-main{flex:1;min-width:0}
+.task-name{font-weight:700;line-height:1.5;word-break:break-word}
+.task-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.task.done .task-name{color:var(--muted);text-decoration:line-through}
+.icon-btn{
+  border:1px solid var(--line);background:var(--surface-2);
+  border-radius:10px;min-width:44px;min-height:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.8rem;color:var(--muted);
+}
+.icon-btn:hover{background:#eef3ef}
+
+form.add{display:flex;gap:8px;flex-wrap:wrap}
+form.add input[type=text]{flex:1;min-width:180px}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:11px 12px;border:1px solid var(--line);
+  border-radius:10px;background:var(--surface);min-height:46px;
+}
+input[type=date]{min-height:46px}
+textarea{line-height:1.7;resize:vertical;min-height:96px}
+label.field{display:block;font-size:.8rem;color:var(--muted);margin:12px 0 5px}
+label.field:first-child{margin-top:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ステップ */
+.steps{margin:4px 0 0}
+.step{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:none}
+.step input{width:22px;height:22px;min-height:0;margin-top:3px;flex:0 0 auto;accent-color:var(--green)}
+.step span{flex:1;line-height:1.6}
+.step.on span{color:var(--muted);text-decoration:line-through}
+
+/* 棒グラフ */
+.chart{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:8px}
+.chart .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.chart .fill{width:100%;border-radius:8px 8px 4px 4px;background:var(--green-soft);min-height:4px;transition:height .3s ease}
+.chart .fill.has{background:var(--green)}
+.chart .day{font-size:.7rem;color:var(--muted)}
+
+.bars{margin-top:8px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-row .k{width:64px;font-size:.8rem;color:var(--muted);flex:0 0 auto}
+.bar-row .track{flex:1;height:10px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+.bar-row .v{height:100%;background:var(--green);border-radius:999px}
+.bar-row .n{width:44px;text-align:right;font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.empty{text-align:center;padding:34px 12px;color:var(--muted)}
+.empty p{margin-bottom:14px}
+
+/* ダイアログ */
+dialog{
+  border:none;border-radius:18px;padding:0;width:min(560px,calc(100vw - 24px));
+  max-height:calc(100vh - 48px);box-shadow:0 20px 60px rgba(34,48,42,.22);
+}
+dialog::backdrop{background:rgba(34,48,42,.38)}
+.dialog-inner{padding:20px}
+.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dialog-head h2{font-size:1.05rem;line-height:1.5}
+.dialog-body{overflow:auto;max-height:calc(100vh - 220px);margin:0 -4px;padding:0 4px}
+.close{border:none;background:var(--surface-2);border-radius:10px;width:40px;height:40px;font-size:1rem;color:var(--muted)}
+
+/* ナビ */
+nav.bottom{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-top:1px solid var(--line);
+  display:flex;justify-content:center;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav.bottom a{
+  flex:1;max-width:140px;text-align:center;text-decoration:none;
+  color:var(--muted);font-size:.78rem;padding:12px 4px 10px;
+  border-top:2px solid transparent;
+}
+nav.bottom a.on{color:var(--green-strong);font-weight:700;border-top-color:var(--green)}
+
+.toast{
+  position:fixed;left:50%;bottom:96px;transform:translate(-50%,8px);
+  background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;
+  font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;
+  max-width:calc(100vw - 32px);text-align:center;
+}
+.toast.on{opacity:.95;transform:translate(-50%,0)}
+
+.hidden{display:none !important}
+
+.steps-guide{margin:14px 0 0;padding-left:1.4em;line-height:1.85}
+.steps-guide li{margin-bottom:10px}
+
+footer.app{text-align:center;color:var(--muted);font-size:.76rem;padding:22px 0 8px}
+footer.app a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>記憶保管庫</div>
+    <p class="brand-sub">やることを、動き出せる「最初の一歩」に変える</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ホーム -->
+  <section id="screen-home" data-screen="home">
+    <p class="muted small" id="today-label" style="margin-bottom:10px"></p>
+
+    <div id="home-empty" class="card empty hidden">
+      <p>まだタスクがありません。<br>まずは1つだけ、書いてみましょう。</p>
+      <button class="btn" data-go="tasks">タスクを追加する</button>
+    </div>
+
+    <div id="home-now" class="card">
+      <p class="now-label">いまやること</p>
+      <h1 class="now-name" id="now-name"></h1>
+      <div class="meta" id="now-meta"></div>
+
+      <div class="first" id="first-box">
+        <p class="first-label">最初の一歩</p>
+        <p class="first-text" id="first-text"></p>
+        <p class="first-progress" id="first-progress"></p>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btn-done">できた</button>
+        <button class="btn quiet" id="btn-notyet">まだ</button>
+      </div>
+
+      <div class="timer">
+        <div>
+          <p class="muted small">タイマー</p>
+          <p class="timer-num" id="timer-num">5:00</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn small quiet" data-timer="5">5分</button>
+          <button class="btn small quiet" data-timer="10">10分</button>
+          <button class="btn small quiet" id="timer-toggle">開始</button>
+        </div>
+      </div>
+
+      <div class="actions mt-lg">
+        <button class="btn quiet small" id="btn-open-detail">ステップを見る・編集</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="stat-streak">0</b><span>連続日数</span></div>
+      <div class="stat"><b id="stat-today">0</b><span>今日できた</span></div>
+      <div class="stat"><b id="stat-total">0</b><span>記録の合計</span></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">この1週間</h2>
+      <div class="chart" id="week-chart"></div>
+    </div>
+  </section>
+
+  <!-- タスク -->
+  <section id="screen-tasks" data-screen="tasks" class="hidden">
+    <div class="card">
+      <h2 class="card-title">タスクを追加</h2>
+      <form class="add" id="add-form">
+        <input type="text" id="add-name" placeholder="やること（例：履歴書を送る）" maxlength="80" required>
+        <div class="grid2" style="width:100%">
+          <select id="add-genre"></select>
+          <input type="date" id="add-due" aria-label="期限">
+        </div>
+        <button class="btn" type="submit" style="width:100%">追加する</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">やること <span class="muted small" id="task-count"></span></h2>
+      <ul id="task-list"></ul>
+      <div id="task-empty" class="empty hidden"><p>まだありません。</p></div>
+    </div>
+
+    <div class="card" id="done-card">
+      <h2 class="card-title">終わったもの</h2>
+      <ul id="done-list"></ul>
+      <div id="done-empty" class="empty hidden"><p>まだありません。</p></div>
+    </div>
+  </section>
+
+  <!-- 傾向 -->
+  <section id="screen-insights" data-screen="insights" class="hidden">
+    <div class="card">
+      <h2 class="card-title">この1週間</h2>
+      <div class="chart" id="week-chart-2"></div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">時間帯</h2>
+      <div class="bars" id="band-bars"></div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">ジャンル</h2>
+      <div class="bars" id="genre-bars"></div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">この条件なら動ける？</h2>
+      <p class="muted small" style="margin-bottom:12px">記録が増えるほど、数字の意味が出てきます。</p>
+      <div id="predict-box"></div>
+    </div>
+  </section>
+
+  <!-- 設定 -->
+  <section id="screen-settings" data-screen="settings" class="hidden">
+    <div class="card">
+      <h2 class="card-title">バックアップ</h2>
+      <p class="muted small" style="margin-bottom:12px">この端末のブラウザに保存されています。機種変更の前に書き出してください。</p>
+      <div class="actions">
+        <button class="btn quiet" id="btn-export">書き出す（JSON）</button>
+        <button class="btn quiet" id="btn-import">読み込む</button>
+      </div>
+      <input type="file" id="file-input" accept="application/json,.json" class="hidden">
+      <p class="muted small mt">読み込みは「今のデータに追加」します。</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">保存について</h2>
+      <ul class="muted small" style="line-height:1.9">
+        <li>記録は、このブラウザの中にだけ保存されます。</li>
+        <li>サーバーには送っていません。広告・解析・AI API も使っていません。</li>
+        <li>ブラウザのデータを消すと、記録も消えます。</li>
+        <li>服薬・メンタル面の記録も入る可能性があります。人と共有する端末では使わないでください。</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">このアプリについて</h2>
+      <p class="muted small">
+        タスクの着手を助けるための個人向けアプリです。画面に出すタスクを1件に絞り、
+        最初の一歩まで分解し、実行の記録を残します。
+      </p>
+      <ul class="muted small" style="line-height:1.9;margin-top:10px">
+        <li>運営：Kiriya Tools（個人開発）</li>
+        <li>連絡先：<a href="/cdn-cgi/l/email-protection#c6aea7b2b2b3adb3b2b3adb386a1aba7afaae8a5a9ab"><span class="__cf_email__" data-cfemail="ff979e8b8b8a948a8b8a948abf98929e9693d19c9092">[email&#160;protected]</span></a></li>
+        <li>医療行為ではありません。診断・治療・服薬の判断の代わりにはなりません。</li>
+        <li>記録の正確性は保証しません。大事な記録は JSON で書き出してください。</li>
+        <li>予告なく内容を変更・停止することがあります。</li>
+      </ul>
+      <div class="actions mt-lg">
+        <button class="btn quiet" id="btn-share">Xで共有する</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">データをすべて削除</h2>
+      <p class="muted small" style="margin-bottom:12px">このブラウザのタスク・ステップ・記録を全部消します。元に戻せません。</p>
+      <button class="btn danger" id="btn-wipe">すべて削除する</button>
+    </div>
+  </section>
+
+</main>
+
+<dialog id="detail">
+  <div class="dialog-inner">
+    <div class="dialog-head">
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="閉じる">✕</button>
+    </div>
+    <div class="dialog-body">
+      <div class="meta" id="detail-meta"></div>
+
+      <h3 class="card-title mt-lg">最初の一歩</h3>
+      <ul class="steps" id="detail-steps"></ul>
+
+      <form id="steps-form" class="mt">
+        <label class="field" for="steps-text">1行に1つずつ。書き換えて保存できます。</label>
+        <textarea id="steps-text" rows="5"></textarea>
+        <div class="actions mt">
+          <button class="btn" type="submit">このステップで保存</button>
+          <button class="btn quiet" type="button" id="steps-reset">標準に戻す</button>
+        </div>
+      </form>
+
+      <h3 class="card-title mt-lg">記録する</h3>
+      <form id="record-form">
+        <div class="grid2">
+          <div>
+            <label class="field" for="rec-min">やった時間（分）</label>
+            <input type="number" id="rec-min" min="1" max="600" value="5">
+          </div>
+          <div>
+            <label class="field" for="rec-energy">コンディション</label>
+            <select id="rec-energy">
+              <option value="">未選択</option>
+              <option value="3">良い</option>
+              <option value="2">ふつう</option>
+              <option value="1">しんどい</option>
+            </select>
+          </div>
+        </div>
+        <label class="field" for="rec-note">ひとこと（任意）</label>
+        <input type="text" id="rec-note" maxlength="200" placeholder="どこで止まったか、など">
+        <div class="actions mt">
+          <button class="btn" type="submit" name="r" value="1">できた</button>
+          <button class="btn quiet" type="submit" name="r" value="0">まだ</button>
+        </div>
+      </form>
+
+      <div class="actions mt-lg">
+        <button class="btn quiet small" id="detail-close-task">このタスクを終わる</button>
+        <button class="btn quiet small" id="detail-delete">削除</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<nav class="bottom">
+  <a href="#" data-nav="home" class="on">ホーム</a>
+  <a href="#" data-nav="tasks">タスク</a>
+  <a href="#" data-nav="insights">傾向</a>
+  <a href="#" data-nav="settings">設定</a>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="intro">
+  <div class="dialog-inner">
+    <div class="dialog-head">
+      <h2>はじめての方へ</h2>
+      <button class="close" id="intro-close" aria-label="閉じる">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="muted">画面に出るのは、<strong>今やること1件だけ</strong>。最初の一歩まで分けて、できた／まだを1タップで記録します。</p>
+      <ol class="steps-guide">
+        <li><b>タスクを1つ足す</b><br><span class="muted small">「履歴書を送る」のような、終わっていないこと。</span></li>
+        <li><b>最初の一歩が出る</b><br><span class="muted small">「写真を用意する」のように、5分で終わる大きさに分かれます。書き換えもできます。</span></li>
+        <li><b>できた／まだ を押す</b><br><span class="muted small">どちらも記録になります。できなかった日も、大事なデータです。</span></li>
+      </ol>
+      <p class="muted small mt-lg">
+        記録は、いま開いている<strong>この端末のブラウザにだけ</strong>保存されます。サーバーには送りません。
+        他の人には見えません。ブラウザのデータを消すと記録も消えるので、ときどき設定画面から書き出してください。
+      </p>
+      <p class="muted small">
+        このアプリは医療行為ではありません。診断・治療・服薬の判断の代わりにはなりません。
+      </p>
+      <div class="actions mt-lg">
+        <button class="btn" id="intro-start">はじめる</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+(function(){
+"use strict";
+
+/* ---------------- 基礎 ---------------- */
+const KEY = "kioku.hoko.v1";
+const GENRES = ["勉強","仕事","家事","連絡","健康","趣味","その他"];
+const BAND_LABEL = ["朝","昼","夜"];
+
+const $ = (id) => document.getElementById(id);
+const uid = () => Math.random().toString(36).slice(2,10);
+const pad = (n) => String(n).padStart(2,"0");
+
+const now = () => new Date();
+const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const isoDateTime = (d) => `${isoDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+function bandOf(d){
+  const h = d.getHours();
+  if (h >= 5 && h < 11) return 0;
+  if (h >= 11 && h < 17) return 1;
+  return 2;
+}
+
+const WEEKDAY = ["日","月","火","水","木","金","土"];
+
+/* ---------------- 保存 ---------------- */
+let state = { v:1, tasks:[], steps:[], records:[], templates:{} };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (raw){
+      const p = JSON.parse(raw);
+      state = Object.assign({v:1,tasks:[],steps:[],records:[],templates:{}}, p);
+    }
+  }catch(e){ /* 壊れていたら新規に始める */ }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e){ toast("保存できませんでした（空き容量不足かもしれません）"); }
+}
+
+/* ---------------- ステップの自動分解 ---------------- */
+const TEMPLATES = {
+  "履歴書": ["写真を用意する","学歴・職歴を下書きする","志望動機を3行で書く","1行ずつ清書する"],
+  "職務経歴書": ["職歴を時系列で書き出す","各社でやったことを3つ挙げる","1社ずつ文章にする","読み返して誤字を直す"],
+  "面接": ["会社名と応募職種を確認する","聞かれそうな質問を5つ書く","答えを1つずつ声に出す","持ち物を前日にそろえる"],
+  "速記": ["隙間時間に書いたり見たりして練習する","早稲田式速記の動画を見る","サイトで練習する"],
+  "服薬": ["薬を手元に出す","コップに水を入れる","飲む","飲んだことを記録する"],
+  "メール": ["宛先と用件を1行で書く","本文を3行で書く","読み返す","送る"],
+  "電話": ["かける用件を1行で書く","先方の名前と番号を確認する","メモを用意する","かける"],
+  "掃除": ["範囲を1つに決める","必要な道具を出す","5分だけやる","道具を戻す"],
+  "洗濯": ["洗濯物を集める","洗濯機に入れる","回す","干す"],
+  "料理": ["何を作るか1つ決める","材料を出す","切る","火にかける"],
+  "買い物": ["買うものを3つ書く","店を決める","行く","戻ったら片づける"],
+  "書類": ["書類を開く","記入する欄を1つ選ぶ","1欄だけ書く","日付と名前を確認する"],
+  "勉強": ["教材を開く","今日やる範囲を1行で決める","5分だけ読む","分かったことを1行書く"],
+  "運動": ["靴を履く","外に出る","5分歩く","戻る"],
+  "病院": ["受診の用件を1行で書く","保険証とお薬手帳を出す","予約を確認する","行く"],
+  "確定申告": ["必要書類を集める","収入を集計する","経費を集計する","入力する"],
+  "会議": ["議題を確認する","メモの準備をする","参加する","決まったことを1行で書く"]
+};
+const GENERIC = ["やることを紙に1行で書き出す","一番小さい最初の一歩を決める","5分だけタイマーをセットして始める"];
+
+function makeSteps(name){
+  const n = String(name||"");
+  for (const key of Object.keys(TEMPLATES)){
+    if (n.includes(key)) return TEMPLATES[key].slice();
+  }
+  const saved = state.templates[n];
+  if (Array.isArray(saved) && saved.length) return saved.slice();
+  return GENERIC.slice();
+}
+
+function stepsOf(taskId){
+  return state.steps.filter(s => s.taskId === taskId).sort((a,b)=>a.pos-b.pos);
+}
+function ensureSteps(task){
+  let list = stepsOf(task.id);
+  if (!list.length){
+    const texts = makeSteps(task.name);
+    texts.forEach((t,i)=> state.steps.push({id:uid(), taskId:task.id, text:t, done:false, pos:i}));
+    save();
+    list = stepsOf(task.id);
+  }
+  return list;
+}
+function replaceSteps(taskId, texts){
+  state.steps = state.steps.filter(s => s.taskId !== taskId);
+  texts.forEach((t,i)=> state.steps.push({id:uid(), taskId:taskId, text:t, done:false, pos:i}));
+  save();
+}
+
+/* ---------------- タスク ---------------- */
+function addTask(name, genre, due){
+  const t = { id:uid(), name:name.trim().slice(0,80), genre:GENRES.includes(genre)?genre:"その他",
+              due:due||"", status:"todo", est:null, createdAt:isoDateTime(now()), doneAt:null };
+  state.tasks.push(t);
+  save();
+  return t;
+}
+function getTask(id){ return state.tasks.find(t => t.id === id) || null; }
+
+function openTasks(){
+  return state.tasks.filter(t => t.status !== "done");
+}
+function nextTask(){
+  const list = openTasks();
+  if (!list.length) return null;
+  const score = (t) => {
+    let s = 0;
+    if (t.due) {
+      const d = new Date(t.due + "T23:59:59");
+      const diff = Math.round((d - now()) / 86400000);
+      s += diff <= 0 ? -1000 : -diff;
+    }
+    if (t.status === "doing") s -= 100;
+    if (t.est) s += Math.min(t.est, 120);
+    return s;
+  };
+  return list.slice().sort((a,b)=> score(a) - score(b))[0];
+}
+
+/* ---------------- 記録 ---------------- */
+function addRecord(opt){
+  const d = now();
+  const r = {
+    id:uid(), at:isoDateTime(d), taskId:opt.taskId||null, taskName:opt.taskName||"",
+    stepText:opt.stepText||"", minutes:Number(opt.minutes)||5, band:bandOf(d),
+    genre:opt.genre||"その他", energy:opt.energy||null,
+    result:opt.result?1:0, note:(opt.note||"").slice(0,200)
+  };
+  state.records.push(r);
+  save();
+  return r;
+}
+
+/* ---------------- 集計 ---------------- */
+function doneRecords(){ return state.records.filter(r => r.result); }
+
+function todayDone(){
+  const t = isoDate(now());
+  return doneRecords().filter(r => r.at.slice(0,10) === t).length;
+}
+
+function streak(){
+  const days = new Set(doneRecords().map(r => r.at.slice(0,10)));
+  let count = 0;
+  const d = now();
+  if (!days.has(isoDate(d))) d.setDate(d.getDate()-1);
+  while (days.has(isoDate(d))){
+    count++;
+    d.setDate(d.getDate()-1);
+  }
+  return count;
+}
+
+function lastDays(n){
+  const out = [];
+  for (let i=n-1;i>=0;i--){
+    const d = now();
+    d.setDate(d.getDate()-i);
+    const key = isoDate(d);
+    out.push({
+      key,
+      label: WEEKDAY[d.getDay()],
+      count: doneRecords().filter(r => r.at.slice(0,10) === key).length
+    });
+  }
+  return out;
+}
+
+function drawChart(el, days){
+  const max = Math.max(1, ...days.map(d => d.count));
+  el.innerHTML = days.map(d => {
+    const h = Math.round((d.count / max) * 88);
+    return `<div class="bar">
+      <div class="fill ${d.count ? "has":""}" style="height:${d.count ? Math.max(h,8) : 3}px"></div>
+      <span class="day">${d.label}</span>
+    </div>`;
+  }).join("");
+}
+
+function drawBars(el, entries){
+  const max = Math.max(1, ...entries.map(e => e.value));
+  el.innerHTML = entries.map(e => `
+    <div class="bar-row">
+      <span class="k">${e.label}</span>
+      <span class="track"><span class="v" style="width:${Math.round(e.value/max*100)}%"></span></span>
+      <span class="n">${e.value}</span>
+    </div>`).join("");
+}
+
+/* ---------------- 描画：ホーム ---------------- */
+function dueLabel(due){
+  if (!due) return "";
+  const d = new Date(due + "T23:59:59");
+  const diff = Math.round((d - now()) / 86400000);
+  if (diff < 0) return `${d.getMonth()+1}/${d.getDate()}（${Math.abs(diff)}日超過）`;
+  if (diff === 0) return "今日まで";
+  if (diff === 1) return "明日まで";
+  return `${d.getMonth()+1}/${d.getDate()}まで`;
+}
+
+let currentTaskId = null;
+
+function renderHome(){
+  const d = now();
+  $("today-label").textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${WEEKDAY[d.getDay()]}）`;
+
+  $("stat-streak").textContent = streak();
+  $("stat-today").textContent = todayDone();
+  $("stat-total").textContent = state.records.length;
+
+  drawChart($("week-chart"), lastDays(7));
+
+  const task = nextTask();
+  const empty = $("home-empty"), box = $("home-now");
+
+  if (!task){
+    box.classList.add("hidden");
+    empty.classList.remove("hidden");
+    const hasAny = state.tasks.length > 0;
+    empty.querySelector("p").innerHTML = hasAny
+      ? "今日のぶんは終わっています。<br>積み重ね、ちゃんと残っています。"
+      : "まだタスクがありません。<br>まずは1つだけ、書いてみましょう。";
+    const btn = empty.querySelector("button");
+    btn.textContent = hasAny ? "タスクを見る" : "タスクを追加する";
+    btn.dataset.go = "tasks";
+    currentTaskId = null;
+    return;
+  }
+
+  empty.classList.add("hidden");
+  box.classList.remove("hidden");
+
+  currentTaskId = task.id;
+  $("now-name").textContent = task.name;
+
+  const chips = [];
+  chips.push(`<span class="chip genre">${task.genre}</span>`);
+  if (task.due) chips.push(`<span class="chip due">${dueLabel(task.due)}</span>`);
+  if (task.status === "doing") chips.push(`<span class="chip doing">着手中</span>`);
+  $("now-meta").innerHTML = chips.join("");
+
+  const steps = ensureSteps(task);
+  const current = steps.find(s => !s.done);
+  const doneN = steps.filter(s => s.done).length;
+
+  if (current){
+    $("first-text").textContent = current.text;
+    $("first-progress").textContent = steps.length ? `${doneN} / ${steps.length} ステップ` : "";
+  } else {
+    $("first-text").textContent = "このタスクのステップは全部終わっています";
+    $("first-progress").textContent = `${doneN} / ${steps.length} ステップ`;
+  }
+
+  $("btn-done").textContent = current ? "この一歩ができた" : "できた";
+}
+
+/* ---------------- 描画：タスク ---------------- */
+function taskItem(t, isDone){
+  const chips = [`<span class="chip genre">${t.genre}</span>`];
+  if (t.due) chips.push(`<span class="chip due">${dueLabel(t.due)}</span>`);
+  if (t.status === "doing") chips.push(`<span class="chip doing">着手中</span>`);
+  return `<li class="task ${isDone?"done":""}">
+    <div class="task-main">
+      <p class="task-name">${escapeHtml(t.name)}</p>
+      <div class="task-meta">${chips.join("")}</div>
+    </div>
+    <button class="icon-btn" data-open="${t.id}">開く</button>
+    ${isDone
+      ? `<button class="icon-btn" data-reopen="${t.id}">戻す</button>`
+      : `<button class="icon-btn" data-done="${t.id}">完了</button>`}
+  </li>`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function renderTasks(){
+  const active = state.tasks.filter(t => t.status !== "done");
+  const done = state.tasks.filter(t => t.status === "done");
+
+  $("task-count").textContent = active.length ? `（${active.length}件）` : "";
+  $("task-list").innerHTML = active.map(t => taskItem(t,false)).join("");
+  $("task-empty").classList.toggle("hidden", active.length > 0);
+
+  $("done-list").innerHTML = done.slice().reverse().map(t => taskItem(t,true)).join("");
+  $("done-empty").classList.toggle("hidden", done.length > 0);
+  $("done-card").classList.toggle("hidden", done.length === 0);
+}
+/* ---------------- 描画：傾向 ---------------- */
+function renderInsights(){
+  drawChart($("week-chart-2"), lastDays(7));
+
+  const bands = [0,1,2].map(b => ({
+    label: BAND_LABEL[b],
+    value: doneRecords().filter(r => r.band === b).length
+  }));
+  drawBars($("band-bars"), bands);
+
+  const g = {};
+  doneRecords().forEach(r => { g[r.genre] = (g[r.genre]||0) + 1; });
+  let entries = GENRES.map(name => ({label:name, value:g[name]||0})).filter(e => e.value > 0);
+  drawBars($("genre-bars"), entries.length ? entries : [{label:"まだ記録なし", value:0}]);
+
+  renderPredict();
+}
+
+function renderPredict(){
+  const recs = state.records;
+  const el = $("predict-box");
+  if (!recs.length){
+    el.innerHTML = `<p class="muted small">記録がまだありません。1件つけると、ここに数字が出ます。</p>`;
+    return;
+  }
+  const b = bandOf(now());
+  const totalOk = recs.filter(r => r.result).length;
+  const overall = totalOk / recs.length;
+  const inBand = recs.filter(r => r.band === b);
+  const bandOk = inBand.filter(r => r.result).length;
+  const bandRate = inBand.length ? bandOk / inBand.length : overall;
+  const weight = inBand.length / (inBand.length + 8);
+  const p = Math.round((bandRate * weight + overall * (1 - weight)) * 100);
+
+  el.innerHTML = `
+    <p style="font-size:1.8rem;font-weight:700;color:var(--green-strong);line-height:1.3">${p}%</p>
+    <p class="muted small">
+      「${BAND_LABEL[b]}」の記録 ${inBand.length}件のうち ${bandOk}件が「できた」。
+      全体は ${Math.round(overall*100)}%（${recs.length}件）。
+      記録が少ないうちは全体の平均に寄せて計算しています。
+    </p>
+    ${recs.length < 30 ? `<p class="muted small mt">まだ占いくらいに思ってください。30件を超えると安定してきます。</p>` : ``}`;
+}
+
+/* ---------------- 設定 ---------------- */
+function exportJSON(){
+  const payload = Object.assign({app:"kioku-hoko", exportedAt:isoDateTime(now())}, state);
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `kioku-backup-${isoDate(now())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  toast("書き出しました");
+}
+
+function importJSON(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const p = JSON.parse(fr.result);
+      if (!p || !Array.isArray(p.tasks)) throw new Error("bad");
+      const idMap = {};
+      (p.tasks||[]).forEach(t => {
+        const nt = addTask(t.name || "（名前なし）", t.genre, t.due);
+        nt.status = (t.status === "done" || t.status === "doing") ? t.status : "todo";
+        idMap[t.id] = nt.id;
+      });
+      (p.steps||[]).forEach(s => {
+        const tid = idMap[s.taskId];
+        if (tid) state.steps.push({id:uid(), taskId:tid, text:s.text||"", done:!!s.done, pos:s.pos||0});
+      });
+      (p.records||[]).forEach(r => {
+        state.records.push({
+          id:uid(), at:r.at||isoDateTime(now()), taskId:idMap[r.taskId]||null,
+          taskName:r.taskName||"", stepText:r.stepText||"", minutes:Number(r.minutes)||5,
+          band:Number(r.band)||0, genre:r.genre||"その他", energy:r.energy||null,
+          result:r.result?1:0, note:r.note||""
+        });
+      });
+      if (p.templates) Object.assign(state.templates, p.templates);
+      save(); renderAll(); toast("読み込みました");
+    }catch(e){
+      toast("このアプリのバックアップではありません");
+    }
+  };
+  fr.readAsText(file);
+}
+
+function wipeAll(){
+  if (!confirm("このブラウザのタスク・ステップ・記録をすべて消します。元に戻せません。")) return;
+  state = { v:1, tasks:[], steps:[], records:[], templates:{} };
+  save(); renderAll(); toast("すべて削除しました");
+}
+
+/* ---------------- ダイアログ ---------------- */
+let detailTaskId = null;
+
+function openDetail(id){
+  const task = getTask(id);
+  if (!task) return;
+  detailTaskId = id;
+
+  const steps = ensureSteps(task);
+  $("detail-title").textContent = task.name;
+
+  const chips = [`<span class="chip genre">${task.genre}</span>`];
+  if (task.due) chips.push(`<span class="chip due">${dueLabel(task.due)}</span>`);
+  $("detail-meta").innerHTML = chips.join("");
+
+  $("detail-steps").innerHTML = steps.length ? steps.map(s => `
+    <li class="step ${s.done?"on":""}">
+      <input type="checkbox" data-step="${s.id}" ${s.done?"checked":""} aria-label="${escapeHtml(s.text)}">
+      <span>${escapeHtml(s.text)}</span>
+    </li>`).join("") : `<li class="muted small">ステップがありません。下に書いて保存してください。</li>`;
+
+  $("steps-text").value = steps.map(s => s.text).join("\n");
+  $("rec-min").value = 5;
+  $("rec-energy").value = "";
+  $("rec-note").value = "";
+
+  if (!$("detail").open) $("detail").showModal();
+}
+
+function closeDetail(){
+  if ($("detail").open) $("detail").close();
+}
+
+/* ---------------- 記録の実行 ---------------- */
+function recordCurrent(result, minutes, energy, note, stepText, taskId, taskName, genre){
+  const r = addRecord({
+    taskId: taskId, taskName: taskName, stepText: stepText,
+    minutes: minutes, genre: genre, energy: energy,
+    result: result, note: note
+  });
+  if (result && taskId){
+    const t = getTask(taskId);
+    if (t && t.status === "todo"){ t.status = "doing"; }
+  }
+  save();
+  return r;
+}
+
+/* ---------------- 画面切替 ---------------- */
+function show(screen){
+  document.querySelectorAll("[data-screen]").forEach(el => {
+    el.classList.toggle("hidden", el.dataset.screen !== screen);
+  });
+  document.querySelectorAll("nav.bottom a").forEach(a => {
+    a.classList.toggle("on", a.dataset.nav === screen);
+  });
+  window.scrollTo(0, 0);
+}
+
+function renderAll(){
+  renderHome();
+  renderTasks();
+  renderInsights();
+}
+
+/* ---------------- トースト ---------------- */
+let toastTimer = null;
+function toast(msg){
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("on"), 2200);
+}
+
+/* ---------------- タイマー ---------------- */
+let timerTotal = 300;
+let timerLeft = 300;
+let timerInt = null;
+
+function drawTimer(){
+  const m = Math.floor(timerLeft / 60);
+  const s = timerLeft % 60;
+  const el = $("timer-num");
+  el.textContent = `${m}:${pad(s)}`;
+  el.classList.toggle("done", timerLeft === 0);
+}
+
+function setTimer(min){
+  stopTimer();
+  timerTotal = min * 60;
+  timerLeft = timerTotal;
+  drawTimer();
+  $("timer-toggle").textContent = "開始";
+}
+
+function stopTimer(){
+  if (timerInt){ clearInterval(timerInt); timerInt = null; }
+}
+
+function toggleTimer(){
+  if (timerInt){
+    stopTimer();
+    $("timer-toggle").textContent = "再開";
+    return;
+  }
+  if (timerLeft <= 0) timerLeft = timerTotal;
+  $("timer-toggle").textContent = "一時停止";
+  timerInt = setInterval(() => {
+    timerLeft--;
+    if (timerLeft <= 0){
+      timerLeft = 0;
+      stopTimer();
+      $("timer-toggle").textContent = "開始";
+      drawTimer();
+      toast("時間になりました。5分だけ、やってみましょう");
+      return;
+    }
+    drawTimer();
+  }, 1000);
+}
+
+/* ---------------- イベント ---------------- */
+function bindEvents(){
+
+  document.querySelectorAll("nav.bottom a").forEach(a => {
+    a.addEventListener("click", (e) => { e.preventDefault(); show(a.dataset.nav); });
+  });
+
+  document.querySelectorAll("[data-go]").forEach(b => {
+    b.addEventListener("click", () => show(b.dataset.go));
+  });
+
+  // タスク追加
+  $("add-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("add-name").value.trim();
+    if (!name) return;
+    addTask(name, $("add-genre").value, $("add-due").value);
+    $("add-name").value = "";
+    $("add-due").value = "";
+    renderAll();
+    toast("追加しました。最初の一歩を作ります");
+  });
+
+  // タスク一覧のボタン
+  document.body.addEventListener("click", (e) => {
+    const open = e.target.closest("[data-open]");
+    if (open){ openDetail(open.dataset.open); return; }
+
+    const doneBtn = e.target.closest("[data-done]");
+    if (doneBtn){
+      const t = getTask(doneBtn.dataset.done);
+      if (!t) return;
+      t.status = "done"; t.doneAt = isoDateTime(now());
+      addRecord({taskId:t.id, taskName:t.name, minutes:5, genre:t.genre, result:1, note:""});
+      save(); renderAll(); toast("おつかれさまでした");
+      return;
+    }
+
+    const reopen = e.target.closest("[data-reopen]");
+    if (reopen){
+      const t = getTask(reopen.dataset.reopen);
+      if (!t) return;
+      t.status = "todo"; t.doneAt = null;
+      save(); renderAll();
+    }
+  });
+
+  // ステップのチェック
+  $("detail-steps").addEventListener("change", (e) => {
+    const box = e.target.closest("[data-step]");
+    if (!box) return;
+    const s = state.steps.find(x => x.id === box.dataset.step);
+    if (!s) return;
+    s.done = box.checked;
+    save();
+    renderHome();
+  });
+
+  // ステップ保存
+  $("steps-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const task = getTask(detailTaskId);
+    if (!task) return;
+    const texts = $("steps-text").value.split("\n").map(s => s.trim()).filter(Boolean).slice(0,20);
+    if (!texts.length){ toast("1行以上入れてください"); return; }
+    replaceSteps(task.id, texts);
+    state.templates[task.name] = texts.slice();
+    save();
+    openDetail(task.id);
+    renderHome();
+    toast("このタスク専用のステップとして保存しました");
+  });
+
+  $("steps-reset").addEventListener("click", () => {
+    const task = getTask(detailTaskId);
+    if (!task) return;
+    replaceSteps(task.id, makeSteps(task.name));
+    openDetail(task.id);
+    renderHome();
+    toast("標準のステップに戻しました");
+  });
+
+  // 記録フォーム
+  $("record-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const task = getTask(detailTaskId);
+    if (!task) return;
+    const result = e.submitter && e.submitter.value === "0" ? 0 : 1;
+    const minutes = Number($("rec-min").value) || 5;
+    const energy = $("rec-energy").value ? Number($("rec-energy").value) : null;
+    const note = $("rec-note").value.trim();
+    const step = stepsOf(task.id).find(s => !s.done);
+
+    recordCurrent(result, minutes, energy, note, step ? step.text : "", task.id, task.name, task.genre);
+
+    if (result && step){ step.done = true; save(); }
+
+    closeDetail();
+    renderAll();
+    toast(result ? "よくやった。記録しました" : "記録しました。できなかった日も大事なデータ");
+  });
+
+  // ホームの「できた」「まだ」
+  $("btn-done").addEventListener("click", () => {
+    const task = getTask(currentTaskId);
+    if (!task) return;
+    const steps = ensureSteps(task);
+    const step = steps.find(s => !s.done);
+    recordCurrent(1, task.est || 5, null, "", step ? step.text : "", task.id, task.name, task.genre);
+    if (step){ step.done = true; save(); }
+    renderAll();
+    toast("よくやった。一歩すすみました");
+  });
+
+  $("btn-notyet").addEventListener("click", () => {
+    const task = getTask(currentTaskId);
+    if (!task) return;
+    const steps = ensureSteps(task);
+    const step = steps.find(s => !s.done);
+    recordCurrent(0, task.est || 5, null, "", step ? step.text : "", task.id, task.name, task.genre);
+    renderAll();
+    toast("記録しました。続きは明日の自分に渡しておこう");
+  });
+
+  $("btn-open-detail").addEventListener("click", () => {
+    if (currentTaskId) openDetail(currentTaskId);
+  });
+
+  $("detail-close").addEventListener("click", closeDetail);
+
+  $("detail-close-task").addEventListener("click", () => {
+    const task = getTask(detailTaskId);
+    if (!task) return;
+    task.status = "done"; task.doneAt = isoDateTime(now());
+    addRecord({taskId:task.id, taskName:task.name, minutes:5, genre:task.genre, result:1, note:""});
+    save(); closeDetail(); renderAll(); toast("おつかれさまでした");
+  });
+
+  $("detail-delete").addEventListener("click", () => {
+    const task = getTask(detailTaskId);
+    if (!task) return;
+    if (!confirm(`「${task.name}」を削除しますか？`)) return;
+    state.tasks = state.tasks.filter(t => t.id !== task.id);
+    state.steps = state.steps.filter(s => s.taskId !== task.id);
+    save(); closeDetail(); renderAll();
+  });
+
+  // タイマー
+  document.querySelectorAll("[data-timer]").forEach(b => {
+    b.addEventListener("click", () => setTimer(Number(b.dataset.timer)));
+  });
+  $("timer-toggle").addEventListener("click", toggleTimer);
+
+  // 設定
+  $("btn-export").addEventListener("click", exportJSON);
+  $("btn-import").addEventListener("click", () => $("file-input").click());
+  $("file-input").addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (f) importJSON(f);
+    e.target.value = "";
+  });
+  $("btn-wipe").addEventListener("click", wipeAll);
+
+  // はじめに（初回だけ）
+  let introSeen = false;
+  try { introSeen = !!localStorage.getItem("kioku.intro.seen"); } catch(e){ introSeen = true; }
+  if (!introSeen){
+    try { $("intro").showModal(); } catch(e){}
+  }
+  const closeIntro = () => {
+    try { localStorage.setItem("kioku.intro.seen","1"); } catch(e){}
+    if ($("intro").open) $("intro").close();
+  };
+  $("intro-close").addEventListener("click", closeIntro);
+  $("intro-start").addEventListener("click", closeIntro);
+
+  // 共有
+  $("btn-share").addEventListener("click", () => {
+    const text = "画面に出るのは今やること1件だけ。最初の一歩まで分けて、できた／まだを1タップで記録するアプリです。";
+    const url = location.href.split("#")[0];
+    window.open("https://x.com/intent/post?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url), "_blank", "noopener");
+  });
+}
+
+/* ---------------- 起動 ---------------- */
+function init(){
+  load();
+
+  const sel = $("add-genre");
+  sel.innerHTML = GENRES.map(g => `<option value="${g}">${g}</option>`).join("");
+  sel.value = "仕事";
+
+  bindEvents();
+  setTimer(5);
+  renderAll();
+  show("home");
+}
+
+init();
+
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
